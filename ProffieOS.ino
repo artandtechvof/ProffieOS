@@ -32,7 +32,9 @@
 // #define CONFIG_FILE "config/proffieboard_v1_test_bench_config.h"
 // #define CONFIG_FILE "config/td_proffieboard_config.h"
 // #define CONFIG_FILE "config/teensy_audio_shield_micom.h"
-#define CONFIG_FILE "config/proffieboard_v2_ob4.h"
+// #define CONFIG_FILE "config/proffieboard_v2_ob4.h"
+#define CONFIG_FILE "config/aat_proffie_singleblade_config.h"
+
 
 #ifdef CONFIG_FILE_TEST
 #undef CONFIG_FILE
@@ -430,6 +432,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/circular_section.h"
 #include "functions/marble.h"
 #include "functions/slice.h"
+#include "functions/wav_time.h"
 
 // transitions
 #include "transitions/fade.h"

@@ -72,6 +72,14 @@ FontConfigFile font_config;
 class HybridFont : public SaberBase {
 public:
   HybridFont() : SaberBase(NOLINK) { }
+  
+  // variables to hold current length of in and out wavs, 
+  // to be used in function for layered styles
+  // out_wavtime, in_wavtime [s] set it high to start with, when set to zero functions 
+  // using this parameter might be over before the sound is actualy playing
+  float out_wavtime = 32.767f; 
+  float in_wavtime = 32.767f;
+  
   void Activate() {
     SetupStandardAudio();
     font_config.ReadInCurrentDir("config.ini");
@@ -287,6 +295,7 @@ public:
     if (monophonic_hum_) {
       state_ = STATE_HUM_ON;
       PlayMonophonic(&SFX_poweron, &SFX_hum);
+	  out_wavtime = current_effect_length_;
     } else {
       state_ = STATE_OUT;
       hum_player_ = GetFreeWavPlayer();
@@ -297,6 +306,8 @@ public:
         hum_start_ = millis();
       }
       RefPtr<BufferedWavPlayer> tmp = PlayPolyphonic(SFX_out ? &SFX_out : &SFX_poweron);
+	  out_wavtime = current_effect_length_;
+  	  STDOUT << "out wav length: " << current_effect_length_ << "\n";
       hum_fade_in_ = 0.2;
       if (SFX_humm) {
 	hum_fade_in_ = tmp->length();
@@ -325,6 +336,7 @@ public:
             } else {
               PlayMonophonic(&SFX_pwroff, NULL);
             }
+        in_wavtime = current_effect_length_;
 	    hum_fade_out_ = current_effect_length_;
           } else if (monophonic_hum_) {
             // No poweroff, just fade out...
@@ -335,6 +347,8 @@ public:
         } else {
           state_ = STATE_HUM_FADE_OUT;
           PlayPolyphonic(&SFX_in);
+		  in_wavtime = current_effect_length_;
+		  STDOUT << "in wav length: " << current_effect_length_ << "\n";
 	  hum_fade_out_ = 0.2;
         }
 	state_ = monophonic_hum_ ? STATE_OFF : STATE_HUM_FADE_OUT;
