@@ -800,6 +800,11 @@ public:
     if (track_player_ && !track_player_->isPlaying()) {
       track_player_.Free();
     }
+
+    if (hybrid_font.inout_player_ && !hybrid_font.inout_player_->isPlaying()) {
+      hybrid_font.inout_player_.Free();
+    STDOUT << "Freeing inout player \n";
+    }
 #endif
 
 #ifndef DISABLE_COLOR_CHANGE

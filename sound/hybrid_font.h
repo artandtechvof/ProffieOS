@@ -73,13 +73,6 @@ class HybridFont : public SaberBase {
 public:
   HybridFont() : SaberBase(NOLINK) { }
   
-  // variables to hold current length of in and out wavs, 
-  // to be used in function for layered styles
-  // out_wavtime, in_wavtime [s] set it high to start with, when set to zero functions 
-  // using this parameter might be over before the sound is actualy playing
-  float out_wavtime = 32.767f; 
-  float in_wavtime = 32.767f;
-  
   void Activate() {
     SetupStandardAudio();
     font_config.ReadInCurrentDir("config.ini");
@@ -128,6 +121,7 @@ public:
     lock_player_.Free();
     hum_player_.Free();
     next_hum_player_.Free();
+	inout_player_.Free();
     swing_player_.Free();
     SaberBase::Unlink(this);
     state_ = STATE_OFF;
@@ -135,6 +129,7 @@ public:
 
   RefPtr<BufferedWavPlayer> hum_player_;
   RefPtr<BufferedWavPlayer> next_hum_player_;
+  RefPtr<BufferedWavPlayer> inout_player_;
   RefPtr<BufferedWavPlayer> swing_player_;
   RefPtr<BufferedWavPlayer> lock_player_;
 
@@ -295,7 +290,6 @@ public:
     if (monophonic_hum_) {
       state_ = STATE_HUM_ON;
       PlayMonophonic(&SFX_poweron, &SFX_hum);
-	  out_wavtime = current_effect_length_;
     } else {
       state_ = STATE_OUT;
       hum_player_ = GetFreeWavPlayer();
@@ -305,16 +299,17 @@ public:
         hum_player_->PlayLoop(SFX_humm ? &SFX_humm : &SFX_hum);
         hum_start_ = millis();
       }
-      RefPtr<BufferedWavPlayer> tmp = PlayPolyphonic(SFX_out ? &SFX_out : &SFX_poweron);
-	  out_wavtime = current_effect_length_;
-  	  STDOUT << "out wav length: " << current_effect_length_ << "\n";
+      //RefPtr<BufferedWavPlayer> tmp = PlayPolyphonic(SFX_out ? &SFX_out : &SFX_poweron);
+	  inout_player_ = GetFreeWavPlayer();
+	  inout_player_->PlayOnce(SFX_out ? &SFX_out : &SFX_poweron);
+  	STDOUT << "out wav length: " << inout_player_->length() << "\n";
       hum_fade_in_ = 0.2;
       if (SFX_humm) {
-	hum_fade_in_ = tmp->length();
+	hum_fade_in_ = inout_player_->length();
 	STDOUT << "HUM fade-in time: " << hum_fade_in_ << "\n";
       }
-      else if (font_config.humStart && tmp) {
-        int delay_ms = 1000 * tmp->length() - font_config.humStart;
+      else if (font_config.humStart && inout_player_) {
+        int delay_ms = 1000 * inout_player_->length() - font_config.humStart;
         if (delay_ms > 0 && delay_ms < 30000) {
           hum_start_ += delay_ms;
         }
@@ -336,7 +331,6 @@ public:
             } else {
               PlayMonophonic(&SFX_pwroff, NULL);
             }
-        in_wavtime = current_effect_length_;
 	    hum_fade_out_ = current_effect_length_;
           } else if (monophonic_hum_) {
             // No poweroff, just fade out...
@@ -346,9 +340,10 @@ public:
           }
         } else {
           state_ = STATE_HUM_FADE_OUT;
-          PlayPolyphonic(&SFX_in);
-		  in_wavtime = current_effect_length_;
-		  STDOUT << "in wav length: " << current_effect_length_ << "\n";
+          //PlayPolyphonic(&SFX_in);
+		  inout_player_ = GetFreeWavPlayer();
+		  inout_player_->PlayOnce(&SFX_in);
+	  STDOUT << "in wav length: " << inout_player_->length() << "\n";
 	  hum_fade_out_ = 0.2;
         }
 	state_ = monophonic_hum_ ? STATE_OFF : STATE_HUM_FADE_OUT;

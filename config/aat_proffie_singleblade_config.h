@@ -46,19 +46,28 @@ Preset presets[] = {
 	  Red,
 	  BlastL<White>,
 	  LockupL<AudioFlicker<Red,White>>,
-	  SimpleClashL<White>,
-	  InOutHelperL<InOutFuncX<OutWavTime,InWavTime>>
+	  SimpleClashL<White>, 
+	  InOutHelperL<InOutFuncX< InOutWavPercentage<10>,InOutWavPercentage<5> >>
 	 >>(),
-	"blue"},
+	"layers vader"},
   { "common;Kanan", "tracks/main.wav",
 	StylePtr<Layers<
 	  Blue,
 	  BlastL<White>,
 	  LockupL<AudioFlicker<Blue,White>>,
 	  SimpleClashL<White>,
-	  InOutHelperL<InOutFuncX<OutWavTime,InWavTime>>
+	  InOutHelperL<InOutFuncX< InOutWavPercentage<50>,InOutWavTime>>
 	>>(),
-    "layers"},  
+    "kanan layers"},  
+  { "common;Dark", "tracks/main.wav",
+	StylePtr<Layers<
+	  Blue,
+	  BlastL<White>,
+	  LockupL<AudioFlicker<Blue,White>>,
+	  SimpleClashL<White>,
+	  InOutHelperL<InOutFuncX< InOutWavPercentage<37>,InOutWavTime>>
+	>>(),
+    "dark layers"},  
   { "common;SmthJedi", "tracks/rebels.wav",
     StylePtr<InOutHelper<EasyBlade<OnSpark<Green, White, 555>, White>, 300, 800> >(),
 	"green"},
