@@ -72,7 +72,6 @@ FontConfigFile font_config;
 class HybridFont : public SaberBase {
 public:
   HybridFont() : SaberBase(NOLINK) { }
-  
   void Activate() {
     SetupStandardAudio();
     font_config.ReadInCurrentDir("config.ini");
@@ -121,7 +120,6 @@ public:
     lock_player_.Free();
     hum_player_.Free();
     next_hum_player_.Free();
-	inout_player_.Free();
     swing_player_.Free();
     SaberBase::Unlink(this);
     state_ = STATE_OFF;
@@ -129,7 +127,6 @@ public:
 
   RefPtr<BufferedWavPlayer> hum_player_;
   RefPtr<BufferedWavPlayer> next_hum_player_;
-  RefPtr<BufferedWavPlayer> inout_player_;
   RefPtr<BufferedWavPlayer> swing_player_;
   RefPtr<BufferedWavPlayer> lock_player_;
 
@@ -299,17 +296,14 @@ public:
         hum_player_->PlayLoop(SFX_humm ? &SFX_humm : &SFX_hum);
         hum_start_ = millis();
       }
-      //RefPtr<BufferedWavPlayer> tmp = PlayPolyphonic(SFX_out ? &SFX_out : &SFX_poweron);
-	  inout_player_ = GetFreeWavPlayer();
-	  inout_player_->PlayOnce(SFX_out ? &SFX_out : &SFX_poweron);
-  	STDOUT << "out wav length: " << inout_player_->length() << "\n";
+      RefPtr<BufferedWavPlayer> tmp = PlayPolyphonic(SFX_out ? &SFX_out : &SFX_poweron);
       hum_fade_in_ = 0.2;
       if (SFX_humm) {
-	hum_fade_in_ = inout_player_->length();
+	hum_fade_in_ = tmp->length();
 	STDOUT << "HUM fade-in time: " << hum_fade_in_ << "\n";
       }
-      else if (font_config.humStart && inout_player_) {
-        int delay_ms = 1000 * inout_player_->length() - font_config.humStart;
+      else if (font_config.humStart && tmp) {
+        int delay_ms = 1000 * tmp->length() - font_config.humStart;
         if (delay_ms > 0 && delay_ms < 30000) {
           hum_start_ += delay_ms;
         }
@@ -340,10 +334,7 @@ public:
           }
         } else {
           state_ = STATE_HUM_FADE_OUT;
-          //PlayPolyphonic(&SFX_in);
-		  inout_player_ = GetFreeWavPlayer();
-		  inout_player_->PlayOnce(&SFX_in);
-	  STDOUT << "in wav length: " << inout_player_->length() << "\n";
+          PlayPolyphonic(&SFX_in);
 	  hum_fade_out_ = 0.2;
         }
 	state_ = monophonic_hum_ ? STATE_OFF : STATE_HUM_FADE_OUT;
