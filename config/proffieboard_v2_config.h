@@ -10,50 +10,49 @@
 #define USE_I2S
 #define GYRO_CLASS LSM6DS3H
 
-// Proffieboard pin map
+// Proffieboard pin map  , 5V toleracny according to DS11449 Rev 5 STM32L433xx FT = tolerant, TT is 3.6 tolerant
 enum SaberPins {
   // I2S
-  bclkPin = 3,                   // BCLK (digital audio)   PB13
-  txd0Pin = 26,                  // TXD0 (digital audio)   PA10
-  lrclkPin = 2,                  // LRCLK (digital audio)  PB12
+  bclkPin = 3,                   // BCLK (digital audio)   PB13 FT_fl
+  txd0Pin = 26,                  // TXD0 (digital audio)   PA10 FT_fl
+  lrclkPin = 2,                  // LRCLK (digital audio)  PB12 FT_I
 
   // I2C
-  i2cDataPin = 7,                 // I2C bus, Used by motion sensors  PB9
-  i2cClockPin = 25,               // I2C bus, Used by motion sensors  PA9
+  i2cDataPin = 7,                 // I2C bus, Used by motion sensors  PB9 FT_fl
+  i2cClockPin = 25,               // I2C bus, Used by motion sensors  PA9 FT_fl
 
   // Buttons
-  powerButtonPin = 21,            // power button  PB6
-  auxPin = 23,                    // AUX button    PB5
-  aux2Pin = 22,                   // AUX2 button   PB4
+  powerButtonPin = 21,            // power button  PB6 FT_I
+  auxPin = 23,                    // AUX button    PB5 FT_l
+  aux2Pin = 22,                   // AUX2 button   PB4 FT_fla
 
   // Memory card
-  sdCardSelectPin = 4,            // PB14
-
-  amplifierPin = 24,              // Amplifier enable pin PH1
-  boosterPin = 15,                // Booster enable pin   PH0
-  motionSensorInterruptPin = 12,  // motion sensor interrupt PC13
-
+  sdCardSelectPin = 4,            // PB14 FT_fl
   // No fastled support yet
   spiLedSelect = -1,
   spiLedDataOut =-1,
   spiLedClock = -1,
+  amplifierPin = 24,              // Amplifier enable pin PH1 FT
+  boosterPin = 15,                // Booster enable pin   PH0 FT
+  motionSensorInterruptPin = 12,  // motion sensor interrupt PC13 FT
+
 
   // Neopixel pins
-  bladePin = 16,                  // blade control, either WS2811 or PWM PA0
-  bladeIdentifyPin = 16,          // blade identify input / FoC
-  blade2Pin = 1,                  // PB10
-  blade3Pin = 17,                 // PB3
-  blade4Pin = 0,                  // PA4
-  blade5Pin = 8,                  // PA15 (also UART)
-  blade6Pin = 9,                  // PA02 (also UART)
+  bladePin = 16,                  // blade control, either WS2811 or PWM PA0  FT_a
+  bladeIdentifyPin = 16,          // blade identify input / FoC  
+  blade2Pin = 1,                  // PB10   FT_fl
+  blade3Pin = 17,                 // PA4  -> not 5V tolerant  TT_a
+  blade4Pin = 0,                  // PB3  FT_la	
+  blade5Pin = 8,                  // PA15 (also UART)  FT_li
+  blade6Pin = 9,                  // PA02 (also UART)  FT_la
 
   // Blade power control
-  bladePowerPin1 = 13,            // blade power control PA1
-  bladePowerPin2 = 19,            // blade power control PB8
-  bladePowerPin3 = 18,            // blade power control PA8
-  bladePowerPin4 = 10,            // blade power control PB3
-  bladePowerPin5 = 5,             // blade power control PB15
-  bladePowerPin6 = 6,             // blade power control PB0
+  bladePowerPin1 = 13,            // blade power control PA1  FT_la
+  bladePowerPin2 = 19,            // blade power control PB8  FT_fl
+  bladePowerPin3 = 18,            // blade power control PA8  FT_l
+  bladePowerPin4 = 10,            // blade power control PB3  FT_la
+  bladePowerPin5 = 5,             // blade power control PB15 FT_I
+  bladePowerPin6 = 6,             // blade power control PB0  FT_la
 
   // If there is no neopixels, these can be used as PWM output
   // If neopixels are present, but not on these pins, PWM may still
@@ -66,21 +65,11 @@ enum SaberPins {
   bladePowerPin10 = 16,           // PA00 (also blade ID / neopixels)
 
   // Analog pins
-  batteryLevelPin = 14,           // battery level input PA04
+  batteryLevelPin = 14,           // battery level input PA04 TT_a  -> Not 5V tolerant, not broken out to any pads on proffieboard
 
   // UART
-  rxPin = 8,                      // PA15
-  txPin = 9,                      // PA02
-
-  // MiCOM setup
-  trigger1Pin = 21,   // power button
-  trigger2Pin = 23,   // aux button
-  trigger3Pin = 22,   // aux2 button
-  trigger4Pin = 1,    // data2
-  trigger5Pin = 17,   // data3
-  trigger6Pin = 0,    // data4
-  trigger7Pin = 8,    // RX
-  trigger8Pin = 9,    // TX
+  rxPin = 8,                      // PA15  FT_I
+  txPin = 9,                      // PA02  FT_la
 };
 
 #if PROFFIEBOARD_VERSION - 0 != 2

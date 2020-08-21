@@ -2,6 +2,7 @@
 #define FUNCTIONS_BLADE_ANGLE_H
 
 #include "../common/fuse.h"
+//#include "../sound/sound.h"
 
 // Usage: BladeAngleX<MIN, MAX>
 // Returns 0-32768 based on angle of blade

@@ -211,7 +211,7 @@ private:
 	player = GetFreeWavPlayer();
 	if (!player) return;
       }
-      player->set_volume(0.0f);
+      player->set_volume(0.0);
       player->PlayOnce(effect, start);
       player->PlayLoop(effect);
     }

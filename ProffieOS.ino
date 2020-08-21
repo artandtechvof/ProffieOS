@@ -21,7 +21,8 @@
 // You can have multiple configuration files, and specify which one
 // to use here.
 
-// #define CONFIG_FILE "config/default_proffieboard_config.h"
+#define CONFIG_FILE "config/aat_proffie_singleblade_config.h"
+//#define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
 // #define CONFIG_FILE "config/graflex_v1_config.h"
@@ -31,10 +32,6 @@
 // #define CONFIG_FILE "config/toy_saber_config.h"
 // #define CONFIG_FILE "config/proffieboard_v1_test_bench_config.h"
 // #define CONFIG_FILE "config/td_proffieboard_config.h"
-// #define CONFIG_FILE "config/teensy_audio_shield_micom.h"
-// #define CONFIG_FILE "config/proffieboard_v2_ob4.h"
-#define CONFIG_FILE "config/aat_proffie_singleblade_config.h"
-
 
 #ifdef CONFIG_FILE_TEST
 #undef CONFIG_FILE
@@ -131,11 +128,7 @@
 #ifdef TEENSYDUINO
 #include <DMAChannel.h>
 #include <usb_dev.h>
-
-#ifndef USE_TEENSY4
 #include <kinetis.h>
-#endif
-
 #include <i2c_t3.h>
 #include <SD.h>
 
@@ -191,7 +184,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "$Id: ce12a06a1e236b5101ec60c950530a9a4719a74d $";
+const char version[] = "v4.7 aat singleblade";
 const char install_time[] = __DATE__ " " __TIME__;
 
 #include "common/state_machine.h"
@@ -267,7 +260,6 @@ public:
 #include "common/profiling.h"
 
 uint64_t audio_dma_interrupt_cycles = 0;
-uint64_t pixel_dma_interrupt_cycles = 0;
 uint64_t wav_interrupt_cycles = 0;
 uint64_t loop_cycles = 0;
 
@@ -292,6 +284,7 @@ MonitorHelper monitor_helper;
 
 SaberBase* saberbases = NULL;
 SaberBase::LockupType SaberBase::lockup_ = SaberBase::LOCKUP_NONE;
+SaberBase::LockupType1 SaberBase::lockup1_ = SaberBase::LOCKUP1_NONE;
 SaberBase::ColorChangeMode SaberBase::color_change_mode_ =
   SaberBase::COLOR_CHANGE_MODE_NONE;
 bool SaberBase::on_ = false;
@@ -394,6 +387,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "styles/rgb_cycle.h"
 #include "styles/clash.h"
 #include "styles/lockup.h"  // Also does "drag"
+#include "styles/lockup1.h"  // Also does "drag"
 #include "styles/blast.h"
 #include "styles/strobe.h"
 #include "styles/inout_helper.h"
@@ -425,14 +419,11 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/swing_speed.h"
 #include "functions/sound_level.h"
 #include "functions/blade_angle.h"
+#include "functions/wav_time.h"
 #include "functions/variation.h"
 #include "functions/twist_angle.h"
 #include "functions/layer_functions.h"
 #include "functions/islessthan.h"
-#include "functions/circular_section.h"
-#include "functions/marble.h"
-#include "functions/slice.h"
-#include "functions/wav_time.h"
 
 // transitions
 #include "transitions/fade.h"
@@ -561,13 +552,7 @@ class NoLED;
 #include "styles/length_finder.h"
 
 BladeConfig* current_config = nullptr;
-class BladeBase* GetPrimaryBlade() {
-#if NUM_BLADES == 0
-  return nullptr;
-#else  
-  return current_config->blade1;
-#endif  
-}
+class BladeBase* GetPrimaryBlade() { return current_config->blade1; }
 const char* GetSaveDir() {
   if (!current_config) return "";
   if (!current_config->save_dir) return "";
@@ -585,7 +570,7 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber.h"
+#include "props/saber_aat_1_button.h"
 #endif
 
 PROP_TYPE prop;
@@ -1008,7 +993,6 @@ class Commands : public CommandParser {
       // TODO: list cpu usage for various objects.
       float total_cycles =
         (float)(audio_dma_interrupt_cycles +
-	        pixel_dma_interrupt_cycles +
                  wav_interrupt_cycles +
 		 Looper::CountCycles() +
 		 CountProfileCycles());
@@ -1017,9 +1001,6 @@ class Commands : public CommandParser {
       STDOUT.println("%");
       STDOUT.print("Wav reading: ");
       STDOUT.print(wav_interrupt_cycles * 100.0f / total_cycles);
-      STDOUT.println("%");
-      STDOUT.print("Pixel DMA: ");
-      STDOUT.print(pixel_dma_interrupt_cycles * 100.0f / total_cycles);
       STDOUT.println("%");
       STDOUT.print("LOOP: ");
       STDOUT.print(loop_cycles * 100.0f / total_cycles);
@@ -1032,7 +1013,6 @@ class Commands : public CommandParser {
       DumpProfileLocations(total_cycles);
       noInterrupts();
       audio_dma_interrupt_cycles = 0;
-      pixel_dma_interrupt_cycles = 0;
       wav_interrupt_cycles = 0;
       interrupts();
       return true;
@@ -1429,7 +1409,7 @@ public:
       default_output->println("");
     }
     if (!CommandParser::DoParse(cmd, e)) {
-      STDOUT.print("Whut? :");
+      STDOUT.print("Whut? :");  //commented out for BT testing
       STDOUT.println(cmd);
     }
     STDOUT.print(SA::response_footer());
@@ -1610,10 +1590,7 @@ void setup() {
 #define PROFFIEOS_STARTUP_DELAY 1000
 #endif
   while (millis() - now < PROFFIEOS_STARTUP_DELAY) {
-#ifndef NO_BATTERY_MONITOR  
     srand((rand() * 917823) ^ LSAnalogRead(batteryLevelPin));
-#endif
-
 #ifdef BLADE_DETECT_PIN
     // Figure out if blade is connected or not.
     // Note that if PROFFIEOS_STARTUP_DELAY is smaller than

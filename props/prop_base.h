@@ -23,11 +23,7 @@ class PropBase : CommandParser, Looper, protected SaberBase {
 public:
   PropBase() : CommandParser() {}
   BladeStyle* current_style(){
-#if NUM_BLADES == 0
-    return nullptr;
-#else    
     return current_config->blade1->current_style();
-#endif    
   }
 
   bool NeedsPower() {
@@ -67,6 +63,9 @@ public:
   bool on_pending_ = false;
   uint32_t on_pending_base_;
   uint32_t on_pending_delay_;
+  
+  //uint32_t in_time_;
+  //uint32_t out_time_;  
 
   virtual bool IsOn() {
     return SaberBase::IsOn() || on_pending_;
@@ -154,7 +153,7 @@ public:
 
   virtual void Clash(bool stab) {
     // No clashes in lockup mode.
-    if (SaberBase::Lockup()) return;
+    if (SaberBase::Lockup() | SaberBase::Lockup1()) return;
     // TODO: Pick clash randomly and/or based on strength of clash.
     uint32_t t = millis();
     if (t - last_clash_ < clash_timeout_) {
@@ -398,16 +397,12 @@ public:
 #endif
     return;
 
-#if NUM_BLADES != 0    
-
-  bad_blade:
+   bad_blade:
     STDOUT.println("BAD BLADE");
 #ifdef ENABLE_AUDIO
     talkie.Say(talkie_error_in_15, 15);
     talkie.Say(talkie_blade_array_15, 15);
 #endif
-
-#endif    
   }
 
   void ResumePreset() {
@@ -789,7 +784,7 @@ public:
     if (on_pending_ && millis() - on_pending_base_ >= on_pending_delay_) {
       on_pending_ = false;
       SaberBase::TurnOn();
-    }
+   }
 
     if (clash_pending_ && millis() - last_clash_ >= clash_timeout_) {
       clash_pending_ = false;
@@ -801,10 +796,6 @@ public:
       track_player_.Free();
     }
 
-    if (hybrid_font.inout_player_ && !hybrid_font.inout_player_->isPlaying()) {
-      hybrid_font.inout_player_.Free();
-    STDOUT << "Freeing inout player \n";
-    }
 #endif
 
 #ifndef DISABLE_COLOR_CHANGE
@@ -843,6 +834,19 @@ public:
 
 #endif
 
+   if (change_volume_){
+        float a = fmod(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
+		//int32_t v = dynamic_mixer.get_volume();//current volume
+        int32_t v = current_volume_ + (int32_t)(a * 2000); //a =+/- 1.5
+        if (v > VOLUME) {v = VOLUME;}
+        if (v < 40) {v = 40;}		
+        dynamic_mixer.set_volume(v);
+        //STDOUT << " volume = " << v
+		//       << " a " << a
+		//	   << " angle2 " << fusor.angle2()
+		//	   << "\n";
+	}
+
     Vec3 mss = fusor.mss();
     if (mss.y * mss.y + mss.z * mss.z < 16.0 &&
         (mss.x > 7 || mss.x < -6)  &&
@@ -869,6 +873,18 @@ public:
 #ifdef IDLE_OFF_TIME
   uint32_t last_on_time_;
 #endif
+
+  bool change_volume_ = false;
+  int32_t current_volume_ = 0;
+  void ToggleVolumeChangeMode() {
+    if (!change_volume_){	  
+      current_tick_angle_ = fusor.angle2();
+	  current_volume_ = dynamic_mixer.get_volume();
+	  change_volume_ =  true;
+	} else {
+		change_volume_ = false;
+	}
+  }
 
 #ifndef DISABLE_COLOR_CHANGE
   void ToggleColorChangeMode() {
@@ -1283,10 +1299,22 @@ public:
       SaberBase::SetVariation(variation);
       return true;
     }
+
+    if (!strcmp(cmd, "get_var") || !strcmp(cmd, "get_variation")) {
+      STDOUT.println(SaberBase::GetCurrentVariation());
+      return true;
+    }
+
     if (!strcmp(cmd, "ccmode")) {
       ToggleColorChangeMode();
       return true;
     }
+
+    if (!strcmp(cmd, "ccmode")) {
+      ToggleColorChangeMode();
+      return true;
+    }
+
 #endif
 
 #ifdef ENABLE_SD

@@ -74,8 +74,19 @@ public:
     LOCKUP_MELT,     // For cutting through doors...
     LOCKUP_LIGHTNING_BLOCK,  // Lightning block lockup
   };
+  enum LockupType1 {
+    LOCKUP1_NONE,
+    LOCKUP1_NORMAL,
+    LOCKUP1_DRAG,
+    LOCKUP1_ARMED,   // For detonators and such
+    LOCKUP1_AUTOFIRE, // For blasters and phasers
+    LOCKUP1_MELT,     // For cutting through doors...
+    LOCKUP1_LIGHTNING_BLOCK,  // Lightning block lockup
+  };
   static LockupType Lockup() { return lockup_; }
+  static LockupType1 Lockup1() { return lockup1_; }
   static void SetLockup(LockupType lockup) { lockup_ = lockup; }
+  static void SetLockup1(LockupType1 lockup1) { lockup1_ = lockup1; }
 
   enum ChangeType {
     ENTER_COLOR_CHANGE,
@@ -199,6 +210,7 @@ public:                                                         \
 private:
   static bool on_;
   static LockupType lockup_;
+  static LockupType1 lockup1_;
   static uint32_t last_motion_request_;
   static uint32_t current_variation_;
   static ColorChangeMode color_change_mode_;

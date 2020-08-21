@@ -42,32 +42,43 @@ const unsigned int maxLedsPerStrip = 97;
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
   { "common;VaderII", "tracks/main.wav",
+StylePtr<Layers<
+		Blue,
+		BlastL<White>,
+		LockupL<AudioFlicker<Blue,White>>,
+		SimpleClashL<White>,
+		InOutTrL<  TrWipeX<WavPct<EFFECT_IGNITION,  10>>, TrWipeInX<WavPct<EFFECT_RETRACTION, 5>>,Black>,
+		TransitionEffectL<TrConcat<TrInstant,AlphaL<White,Bump<Int<0>,Int<10000>>>,TrFadeX<WavLen<EFFECT_RETRACTION>>,AlphaL<Orange,Bump<Int<0>,Int<8000>>>,TrFadeX<WavPct<EFFECT_PSTOFF,60>>,AlphaL<Red,Bump<Int<0>,Int<6000>>>,TrFadeX<WavPct<EFFECT_PSTOFF,40>>>,EFFECT_RETRACTION>,
+		TransitionEffectL<TrConcat<TrFadeX<WavPct<EFFECT_PREON,125>>,AlphaL<HumpFlickerL<Orange,10>,Bump<Int<0>,Int<4000>>>,TrFadeX<WavPct<EFFECT_IGNITION,50>>,AlphaL<HumpFlickerL<Orange,15>,Bump<Int<0>,Int<5000>>>,TrFadeX<WavPct<EFFECT_IGNITION,25>>,AlphaL<HumpFlickerL<White,20>,Bump<Int<0>,Int<6000>>>,TrBoingX<WavPct<EFFECT_IGNITION,25>,3>>,EFFECT_PREON>>
+		>(),	
+	"layers vader"},
+  { "common;VaderII", "tracks/main.wav",
 	StylePtr<Layers<
 	  Red,
 	  BlastL<White>,
 	  LockupL<AudioFlicker<Red,White>>,
 	  SimpleClashL<White>, 
-	  InOutHelperL<InOutFuncX< InOutWavPercentage<10>,InOutWavPercentage<5> >>
+	  InOutHelperL<InOutFuncX< WavPct<EFFECT_IGNITION, 10>,WavPct<EFFECT_RETRACTION, 5> >>
 	 >>(),
-	"layers vader"},
+	"layers WavPct vader"},
   { "common;Kanan", "tracks/main.wav",
 	StylePtr<Layers<
 	  Blue,
 	  BlastL<White>,
 	  LockupL<AudioFlicker<Blue,White>>,
 	  SimpleClashL<White>,
-	  InOutHelperL<InOutFuncX< InOutWavPercentage<50>,InOutWavTime>>
+	  InOutHelperL<InOutFuncX< WavLen<EFFECT_IGNITION>,WavLen<EFFECT_RETRACTION> >>
 	>>(),
-    "kanan layers"},  
+    "layers kanan"},  
   { "common;Dark", "tracks/main.wav",
 	StylePtr<Layers<
 	  Blue,
 	  BlastL<White>,
 	  LockupL<AudioFlicker<Blue,White>>,
 	  SimpleClashL<White>,
-	  InOutHelperL<InOutFuncX< InOutWavPercentage<37>,InOutWavTime>>
+	  InOutHelperL<InOutFuncX< Scale<WavPos<EFFECT_IGNITION>, Int<150>, Int<65535>>, WavRem<EFFECT_RETRACTION>  >>
 	>>(),
-    "dark layers"},  
+    "layers progressive dark"},  
   { "common;SmthJedi", "tracks/rebels.wav",
     StylePtr<InOutHelper<EasyBlade<OnSpark<Green, White, 555>, White>, 300, 800> >(),
 	"green"},
@@ -93,8 +104,8 @@ BladeConfig blades[] = {
 
 #ifdef CONFIG_BUTTONS
 Button PowerButton(BUTTON_POWER, powerButtonPin, "pow");
-//ButtonPullDown AuxButton(BUTTON_AUX, auxPin, "aux");
-//PullDownButton Aux2Button(BUTTON_AUX2, aux2Pin, "aux2");
+//PullDownButton AuxButton(BUTTON_AUX, auxPin, "aux");
+//Button Aux2Button(BUTTON_AUX2, aux2Pin, "aux2");
 //PullDownButton UpButton(BUTTON_UP, blade4Pin, "aux3");
 #endif
 

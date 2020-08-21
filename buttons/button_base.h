@@ -44,8 +44,8 @@ public:
 
 protected:
   // We send two events:
-  // the event itself, and the event with a count, dependinging on how
-  // may double-presses there has been. The count starts at FIRST, that way
+  // the event itself, and the event with a count, depending on how
+  // many double-presses there has been. The count starts at FIRST, that way
   // the first event can be distinguished from the rest.
   bool Send(uint32_t event) {
     if (!prop.Event(button_, (EVENT)(event + (EVENT_SECOND_PRESSED - EVENT_FIRST_PRESSED) * press_count_))) {
@@ -84,16 +84,16 @@ protected:
       Send(EVENT_PRESSED);
       push_millis_ = millis();
       current_modifiers |= button_;
-      while (DebouncedRead() && (current_modifiers & button_)) {
+      while (DebouncedRead()) {
         if (millis() - push_millis_ > BUTTON_HELD_TIMEOUT) {
           Send(EVENT_HELD);
-          while (DebouncedRead() && (current_modifiers & button_)) {
+          while (DebouncedRead()) {
             if (millis() - push_millis_ > BUTTON_HELD_MEDIUM_TIMEOUT){
               Send(EVENT_HELD_MEDIUM);
-	      while (DebouncedRead() && (current_modifiers & button_)) {
+              while (DebouncedRead()) {
                 if (millis() - push_millis_ > BUTTON_HELD_LONG_TIMEOUT) {
                   Send(EVENT_HELD_LONG);
-		  while (DebouncedRead() && (current_modifiers & button_)) YIELD();
+                  while (DebouncedRead()) YIELD();
                 }
                 YIELD();
               }
@@ -104,9 +104,7 @@ protected:
         YIELD();
       }
       while (DebouncedRead()) YIELD();
-      if (current_modifiers & button_) {
-	Send(EVENT_RELEASED);
-      }
+      Send(EVENT_RELEASED);
       if (current_modifiers & button_) {
         current_modifiers &=~ button_;
         if (millis() - push_millis_ < BUTTON_SHORT_CLICK_TIMEOUT) {

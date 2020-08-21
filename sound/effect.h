@@ -102,7 +102,7 @@ class Effect {
     all_effects = this;
     reset();
   }
-
+  
   void reset() {
     min_file_ = 20000;
     max_file_ = -1;
@@ -155,7 +155,7 @@ class Effect {
 
 
     file_pattern_ = type_if_found;
-    // STDOUT << "Counting " << filename << " as " << name_ << "\n";
+    //STDOUT << "Counting " << filename << " as " << name_ << "\n";
     num_files_++;
     return true;
   }
@@ -222,10 +222,6 @@ class Effect {
 
   void Select(int n) {
     selected_ = n;
-  }
-  void SelectNext() {
-    selected_++;
-    if (selected_ == (int)files_found()) selected_ = 0;
   }
 
   Effect* GetFollowing() const {
@@ -297,7 +293,11 @@ class Effect {
     }
 
     default_output->print("Playing ");
-    default_output->println(filename);
+    default_output->print(filename);
+    default_output->print(" effect:");
+    default_output->println(name_);
+    //setname(name_); // remember for wav_time function selection
+
   }
 
   // Returns true if file was identified.
@@ -380,20 +380,26 @@ class Effect {
     bool warned = false;
     for (Effect* e = all_effects; e; e = e->next_) {
       if (e->files_found() != (size_t)(e->num_files_)) {
-	if (!warned) {
-	  warned = true;
-	  STDOUT.println("");
-	  STDOUT.println("WARNING: This font seems to be missing some files!!");
-	  talkie.Say(talkie_error_in_15, 15);
-	  talkie.Say(talkie_font_directory_15, 15);
-	}
-	e->Show();
+		if (!warned) {
+		  warned = true;
+		  STDOUT.println("");
+		  STDOUT.println("WARNING: This font seems to be missing some files!!");
+		  talkie.Say(talkie_error_in_15, 15);
+		  talkie.Say(talkie_font_directory_15, 15);
+		}
+		//e->Show();
       }
+      e->Show();
     }
     LOCK_SD(false);
   }
 
   Effect* next_;
+  Effect* current_;
+  
+  // All files must start with this prefix. Public so other functions can use it
+  const char* name_;
+  
 private:
   Effect* following_ = nullptr;
 
@@ -413,10 +419,7 @@ private:
   bool unnumbered_file_found_;
 
   FilePattern file_pattern_ = FilePattern::UNKNOWN;
-
-  // All files must start with this prefix.
-  const char* name_;
-
+  
   // If not -1, return this file.
   int16_t selected_;
 
@@ -430,6 +433,9 @@ private:
   const char* directory_;
 };
 
+
+//EFFECT -> single wav played
+//EFFECT2 -> 1st wav is always followed by wav from second argument
 
 #define EFFECT(X) Effect SFX_##X(#X)
 #define EFFECT2(X, Y) Effect SFX_##X(#X, &SFX_##Y)
@@ -451,7 +457,6 @@ EFFECT2(pwroff, pstoff);
 EFFECT(clash);
 EFFECT(force);    // also polyphonic
 EFFECT(stab);     // also polyphonic
-EFFECT(spin);     // also polyphonic
 EFFECT(blaster);
 EFFECT2(lockup, lockup);
 EFFECT(poweronf); // force poweron

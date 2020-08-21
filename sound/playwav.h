@@ -78,6 +78,8 @@ public:
   void PlayOnce(Effect* effect, float start = 0.0) {
     sample_bytes_ = 0;
     if (effect->Play(filename_)) {
+	  STDOUT << "PlayOnce effect: " << effect->name_ ;	
+	  effectname_ = effect->name_; // set effect name attribute to wav_players
       start_ = start;
       effect_ = nullptr;
       run_ = true;
@@ -114,7 +116,7 @@ private:
   }
 
   template<int bits> int16_t read2() {
-    if (bits == 8) return (*(ptr_++) << 8) - 32768;
+    if (bits == 8) return *(ptr_++) << 8;
     ptr_ += bits / 8 - 2;
     return *((*((int16_t**)&ptr_))++);
   }
@@ -154,10 +156,6 @@ private:
       DecodeBytes4<bits, channels, 22050>();
     else if (rate_ == 11025)
       DecodeBytes4<bits, channels, 11025>();
-    else {
-      default_output->println("Unsupported rate.");
-      Stop();
-    }
   }
 
   template<int bits>
@@ -171,10 +169,6 @@ private:
     else if (bits_ == 16) DecodeBytes2<16>();
     else if (bits_ == 24) DecodeBytes2<24>();
     else if (bits_ == 32) DecodeBytes2<32>();
-    else {
-      default_output->println("Unsupported sample size.");
-      Stop();
-    }
   }
 
   int ReadFile(int n) {
@@ -214,7 +208,7 @@ private:
           default_output->println("Failed to read 12 bytes.");
           goto fail;
         }
-        if (header(0) != 0x46464952 || header(2) != 0x45564157) {
+        if (header(0) != 0x46464952 || header(2) != 0x45564157) {  //'RIFF WAVE'
           default_output->println("Not RIFF WAVE.");
           YIELD();
           goto fail;
@@ -261,7 +255,7 @@ private:
       default_output->print(" rate: ");
       default_output->print(rate_);
       default_output->print(" bits: ");
-      default_output->println(bits_);
+      default_output->print(bits_);
 
       ptr_ = buffer + 8;
       end_ = buffer + 8;
@@ -270,7 +264,7 @@ private:
         if (wav_) {
           if (ReadFile(8) != 8) break;
           len_ = header(1);
-          if (header(0) != 0x61746164) {
+          if (header(0) != 0x61746164) { // 'data'
             file_.Skip(len_);
             continue;
           }
@@ -287,6 +281,11 @@ private:
           len_ -= bytes_to_skip;
           start_ = 0.0;
         }
+		
+		default_output->print(" length ");
+		default_output->print(length());
+		default_output->println(" [s]");
+		duration_ = length();
 
         while (len_) {
           {
@@ -347,9 +346,14 @@ public:
     return !run_;
   }
 
-  // Length, seconds.
+  // Length, seconds, changes while playing
   float length() const {
     return (float)(sample_bytes_) * 8 / (bits_ * rate_);
+  }
+
+  // Length, seconds, retains constant
+  float duration() const {
+    return (float)(duration_);
   }
 
   // Current position, seconds.
@@ -367,17 +371,35 @@ public:
     return filename_;
   }
 
+  const char* effectname() const {
+    return effectname_;
+  }
+  
+  const char* effect2ndname() const {
+	   Effect* e = effect_->GetFollowing(); 
+	   if(e->name_){
+		  return e->name_;
+	   }else{
+		  return NULL;
+	  }	 
+  }  
+  
+  
+  
 private:
   volatile bool run_ = false;
   Effect* volatile effect_ = nullptr;
   Effect::FileID new_file_id_;
   Effect::FileID old_file_id_;
   char filename_[128];
+  //const char* _2ndname_;
+  const char* effectname_;
+
   int16_t* dest_ = nullptr;
   int to_read_ = 0;
   int tmp_;
   float start_ = 0.0;
-
+ 
   int rate_;
   uint8_t channels_;
   uint8_t bits_;
@@ -388,6 +410,7 @@ private:
 
   size_t len_ = 0;
   volatile size_t sample_bytes_ = 0;
+  float duration_ = 0.0;
   unsigned char* ptr_;
   unsigned char* end_;
   unsigned char buffer[512 + 8]  __attribute__((aligned(4)));

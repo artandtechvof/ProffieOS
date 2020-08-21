@@ -41,12 +41,13 @@ public:
   FunctionRunResult run(BladeBase* blade) {
     out_millis_.run(blade);
     in_millis_.run(blade);
+
     uint32_t now = micros();
     uint32_t delta = now - last_micros_;
     last_micros_ = now;
     if (blade->is_on()) {
       if (extension == 0.0) {
-		STDOUT << "InOutFuncX out time: " << out_millis_.getInteger(0) << "\n";
+		 STDOUT << "InOutFuncX out time: " << out_millis_.getInteger(0) << "\n";
          // We might have been off for a while, so delta might
          // be insanely high.
          extension = 0.00001;
@@ -55,7 +56,7 @@ public:
 	extension = std::min(extension, 1.0f);
       }
     } else {
-	if (extension == 1.0f) {STDOUT << "InOutFuncX in time: " << in_millis_.getInteger(0) << "\n";}	
+	  if (extension == 1.0f) {STDOUT << "InOutFuncX in time: " << in_millis_.getInteger(0) << "\n";}	
       extension -= delta / (in_millis_.getInteger(0) * 1000.0);
       extension = std::max(extension, 0.0f);
     }

@@ -3,7 +3,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cstdlib>
 
 // cruft
 #define NELEM(X) (sizeof(X)/sizeof((X)[0]))

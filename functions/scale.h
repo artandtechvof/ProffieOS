@@ -21,7 +21,7 @@ public:
     add_ = a;
   }
   int getInteger(int led) {
-    return (f_.getInteger(led) * mul_ >> 15) + add_;
+    return clampi32((f_.getInteger(led) * mul_ >> 15) + add_, 0, 32768);
   }
 private:
   F f_;
