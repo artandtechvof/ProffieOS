@@ -31,13 +31,14 @@ class WavLen {
 			}
 	}
 	if (!found_){
+		if(shown_) {STDOUT << "WavLen stopped for effect '" << eff_name_ <<"', value retained is: " << value_ << "\n";}
 		//should we retain value after the effect has gone? Only reset it when new effect is selected?
-        value_ = 32767;
+        //value_ = 32767;
         shown_ = false;
 	}
   }
   int getInteger(int led) { return value_; }
-  int value_ = 0;
+  int value_ = 32767;
 private:
   int idx;
   const char* eff_name_;
@@ -77,17 +78,18 @@ class WavPct {
 		}
 	}
 	if (!found_){
+		if(shown_) {STDOUT << "WavPct stopped for effect '" << eff_name_ <<"', value retained is: " << value_ << "\n";}
 	 // for (size_t i = 0; i < NELEM(wav_players); i++) {
 		// if(eff_name_=="pstoff" && wav_players[i].isPlaying() ) STDOUT << wav_players[i].filename() << ", " << wav_players[i].effect2ndname() << " -- pstoff -- not found \n";
 	 // }	
 		//should we retain value after the effect has gone? Only reset it when new effect is selected?
 		//value_ = 0; // make it large so that a InOutHelper does not start with 0 and instantly ignites
-        value_ = 32767;
+        //value_ = 32767;
 		shown_ = false;
 	}
   }
   int getInteger(int led) { return value_; }
-  int value_ = 0;
+  int value_ = 32767;
 private:
   int idx;
   const char* eff_name_;
@@ -125,12 +127,13 @@ class WavPos {
 			}
 	}
 	if (!found_){
-		value_ = 0; // make it 0 so that a pos does start with 0 when sound is not playing.
+		if(shown_) {STDOUT << "WavPos stopped for effect '" << eff_name_ <<"', value retained is: " << value_ << "\n";}
+		//value_ = 0; // make it 0 so that a pos does start with 0 when sound is not playing.
         shown_ = false;
 	}
   }
   int getInteger(int led) { return value_; }
-  int value_;
+  int value_ = 0;
 private:
   int idx;
   const char* eff_name_;
@@ -170,12 +173,13 @@ class WavRem {
 			}
 	}
 	if (!found_){
-		value_ = 32767; // make it large so that a InOutHelper does not start with 0 and instantly ignites
+		if(shown_) {STDOUT << "WavRem stopped for effect '" << eff_name_ <<"', value retained is: " << value_ << "\n";}
+		//value_ = 32767; // make it large so that a InOutHelper does not start with 0 and instantly ignites
         shown_ = false;
 	}
   }
   int getInteger(int led) { return value_; }
-  int value_;
+  int value_ = 32767;
 private:
   int idx;
   const char* eff_name_;
