@@ -90,7 +90,7 @@ NamedStyle named_styles[] = {
       100,2000,1000>>(),
     "Cycle blade, start color, base color, flicker color, blast color, lockup color"
   },
-  { "rainbow", StyleRainbowPtrX<IntArg<1, 300>, IntArg<2, 800>>(),
+  { "rainbow", StyleRainbowRevPtrX<IntArg<1, 300>, IntArg<2, 800>>(),
     "Rainbow blade, extension time, retraction time"
   },
   { "charging", &style_charging, "Charging style" },

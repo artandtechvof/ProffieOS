@@ -16,8 +16,15 @@ public:
       pinMode(i2cDataPin, INPUT_PULLDOWN);
       pinMode(i2cClockPin, INPUT_PULLDOWN);
       SLEEP_MICROS(10);
-      data_detected = analogRead(i2cDataPin) > 800;
-      clock_detected = analogRead(i2cClockPin) > 800;
+      STDOUT.print("I2C data : ");
+      STDOUT.print(analogRead(i2cDataPin));
+      STDOUT.print(", I2C clock : ");
+      STDOUT.println(analogRead(i2cClockPin));
+	  
+      //data_detected = analogRead(i2cDataPin) > 800;
+      //clock_detected = analogRead(i2cClockPin) > 800;
+      data_detected = true; //modification for CAL kestis
+      clock_detected = true; //modification for CAL kestis
       
       pinMode(i2cDataPin, INPUT);
       pinMode(i2cClockPin, INPUT);

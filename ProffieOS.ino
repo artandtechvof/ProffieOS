@@ -21,6 +21,8 @@
 // You can have multiple configuration files, and specify which one
 // to use here.
 
+//#define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
+#define CONFIG_FILE "config/aat_proffie_singleblade_config.h"
 // #define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
@@ -29,10 +31,12 @@
 // #define CONFIG_FILE "config/owk_v2_config.h"
 // #define CONFIG_FILE "config/test_bench_config.h"
 // #define CONFIG_FILE "config/toy_saber_config.h"
-#define CONFIG_FILE "config/proffieboard_v1_test_bench_config.h"
+// #define CONFIG_FILE "config/proffieboard_v1_test_bench_config.h"
 // #define CONFIG_FILE "config/td_proffieboard_config.h"
 // #define CONFIG_FILE "config/teensy_audio_shield_micom.h"
 // #define CONFIG_FILE "config/proffieboard_v2_ob4.h"
+// #define CONFIG_FILE "config/aat_proffie_singleblade_config.h"
+
 
 #ifdef CONFIG_FILE_TEST
 #undef CONFIG_FILE
@@ -136,6 +140,7 @@
 
 #include <i2c_t3.h>
 #include <SD.h>
+//#include <SPI.h> // for apa102??
 
 #define INPUT_ANALOG INPUT
 #else
@@ -162,7 +167,6 @@
 
 #endif
 
-#include <SPI.h>
 #include <math.h>
 #include <malloc.h>
 
@@ -189,7 +193,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "$Id: ce12a06a1e236b5101ec60c950530a9a4719a74d $";
+const char version[] = "V4.8+ master Cal Kestis Enrico";
 const char install_time[] = __DATE__ " " __TIME__;
 
 #include "common/state_machine.h"
@@ -290,11 +294,19 @@ MonitorHelper monitor_helper;
 
 SaberBase* saberbases = NULL;
 SaberBase::LockupType SaberBase::lockup_ = SaberBase::LOCKUP_NONE;
+SaberBase::LockupType1 SaberBase::lockup1_ = SaberBase::LOCKUP1_NONE;
 SaberBase::ColorChangeMode SaberBase::color_change_mode_ =
   SaberBase::COLOR_CHANGE_MODE_NONE;
+SaberBase::VolumeChangeMode SaberBase::volume_change_mode_ =
+  SaberBase::VOLUME_CHANGE_MODE_NONE;
+SaberBase::DimChangeMode SaberBase::dim_change_mode_ =
+  SaberBase::DIM_CHANGE_MODE_NONE;
+SaberBase::MenuChangeMode SaberBase::menu_change_mode_ =
+  SaberBase::MENU_CHANGE_MODE_NONE;
 bool SaberBase::on_ = false;
 uint32_t SaberBase::last_motion_request_ = 0;
 uint32_t SaberBase::current_variation_ = 0;
+uint32_t SaberBase::current_brightness_ = 16384; //16384 = 100%
 
 #include "common/box_filter.h"
 
@@ -392,6 +404,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "styles/rgb_cycle.h"
 #include "styles/clash.h"
 #include "styles/lockup.h"  // Also does "drag"
+#include "styles/lockup1.h"  // Also does "drag"
 #include "styles/blast.h"
 #include "styles/strobe.h"
 #include "styles/inout_helper.h"
@@ -430,6 +443,10 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/circular_section.h"
 #include "functions/marble.h"
 #include "functions/slice.h"
+#include "functions/wav_time.h"
+#include "functions/pct.h"
+#include "functions/mult.h"
+
 
 // transitions
 #include "transitions/fade.h"
@@ -511,6 +528,19 @@ StyleAllocator StyleRainbowPtr() {
 
 // Rainbow blade.
 // Arguments: color, clash color, turn-on/off time
+template<int out_millis,
+          int in_millis,
+          class clash_color = WHITE,
+          class lockup_flicker_color = WHITE>
+StyleAllocator StyleRainbowRevPtr() {
+  typedef AudioFlicker<RainbowRev, lockup_flicker_color> AddFlicker;
+  typedef Lockup<RainbowRev, AddFlicker> AddLockup;
+  typedef SimpleClash<AddLockup, clash_color> AddClash;
+  return StylePtr<InOutHelper<AddClash, out_millis, in_millis> >();
+}
+
+// Rainbow blade.
+// Arguments: color, clash color, turn-on/off time
 template<class out_millis,
           class in_millis,
           class clash_color = WHITE,
@@ -518,6 +548,19 @@ template<class out_millis,
 StyleAllocator StyleRainbowPtrX() {
   typedef AudioFlicker<Rainbow, lockup_flicker_color> AddFlicker;
   typedef Lockup<Rainbow, AddFlicker> AddLockup;
+  typedef SimpleClash<AddLockup, clash_color> AddClash;
+  return StylePtr<InOutHelperX<AddClash, InOutFuncX<out_millis, in_millis>> >();
+}
+
+// Rainbow blade.
+// Arguments: color, clash color, turn-on/off time
+template<class out_millis,
+          class in_millis,
+          class clash_color = WHITE,
+          class lockup_flicker_color = WHITE>
+StyleAllocator StyleRainbowRevPtrX() {
+  typedef AudioFlicker<RainbowRev, lockup_flicker_color> AddFlicker;
+  typedef Lockup<RainbowRev, AddFlicker> AddLockup;
   typedef SimpleClash<AddLockup, clash_color> AddClash;
   return StylePtr<InOutHelperX<AddClash, InOutFuncX<out_millis, in_millis>> >();
 }
@@ -582,7 +625,8 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber.h"
+//#include "props/saber.h"
+#include "props/saber_aat_1_button.h"
 #endif
 
 PROP_TYPE prop;
@@ -782,9 +826,9 @@ class Commands : public CommandParser {
     if (!strcmp(cmd, "sdtest")) {
       SDTestHelper sdtester;
       if (e && !strcmp(e, "all")) {
-	sdtester.TestDir("");
+  sdtester.TestDir("");
       } else {
-	sdtester.TestFont();
+  sdtester.TestFont();
       }
       return true;
     }
@@ -1005,10 +1049,10 @@ class Commands : public CommandParser {
       // TODO: list cpu usage for various objects.
       float total_cycles =
         (float)(audio_dma_interrupt_cycles +
-	        pixel_dma_interrupt_cycles +
+          pixel_dma_interrupt_cycles +
                  wav_interrupt_cycles +
-		 Looper::CountCycles() +
-		 CountProfileCycles());
+     Looper::CountCycles() +
+     CountProfileCycles());
       STDOUT.print("Audio DMA: ");
       STDOUT.print(audio_dma_interrupt_cycles * 100.0f / total_cycles);
       STDOUT.println("%");
@@ -1257,6 +1301,26 @@ class Commands : public CommandParser {
     }
 #endif // ENABLE_DEVELOPER_COMMANDS
 
+#ifdef ENABLE_DEVELOPER_COMMANDS
+//#define HAVE_STM32L4_DMA_GET
+#ifdef HAVE_STM32L4_DMA_GET    
+    if (!strcmp(cmd, "dmamap")) {
+      for (int channel = 0; channel < 16; channel++) {
+  stm32l4_dma_t *dma = stm32l4_dma_get(channel);
+  if (dma) {
+    STDOUT.print(" DMA");
+    STDOUT.print( 1 +(channel / 8) );
+    STDOUT.print("_CH");
+    STDOUT.print( channel % 8 );
+    STDOUT.print(" = ");
+    STDOUT.println(dma->channel >> 4, HEX);
+  }
+      }
+      return true;
+    }
+#endif // HAVE_STM32L4_DMA_GET    
+#endif // ENABLE_DEVELOPER_COMMANDS
+
 #endif  // TEENSYDUINO
 
     return false;
@@ -1327,13 +1391,13 @@ public:
     RFID_SERIAL.begin(9600);
   }
 
-#define RFID_READCHAR() do {						\
-  state_machine_.sleep_until_ = millis();				\
-  while (!RFID_SERIAL.available()) {					\
-    if (millis() - state_machine_.sleep_until_ > 200) goto retry;	\
-    YIELD();								\
-  }									\
-  getc();								\
+#define RFID_READCHAR() do {            \
+  state_machine_.sleep_until_ = millis();       \
+  while (!RFID_SERIAL.available()) {          \
+    if (millis() - state_machine_.sleep_until_ > 200) goto retry; \
+    YIELD();                \
+  }                 \
+  getc();               \
 } while (0)
 
   int c, x;
@@ -1355,15 +1419,15 @@ public:
       if (c != 2) goto retry;
       code = 0;
       for (x = 0; x < 10; x++) {
-	RFID_READCHAR();
-	code <<= 4;
-	if (c >= '0' && c <= '9') {
-	  code |= c - '0';
-	} else if (c >= 'A' && c <= 'F') {
-	  code |= c - ('A' - 10);
-	} else {
-	  goto retry;
-	}
+  RFID_READCHAR();
+  code <<= 4;
+  if (c >= '0' && c <= '9') {
+    code |= c - '0';
+  } else if (c >= 'A' && c <= 'F') {
+    code |= c - ('A' - 10);
+  } else {
+    goto retry;
+  }
       }
       RFID_READCHAR();
       x = code ^ (code >> 24);
@@ -1372,16 +1436,16 @@ public:
       if (c != x) goto retry;
       RFID_READCHAR();
       if (c == 3) {
-	default_output->print("RFID: ");
-	for (int i = 36; i >= 0; i-=4) {
-	  default_output->print((int)((code >> i) & 0xf), HEX);
-	}
-	default_output->println("");
-	for (size_t i = 0; i < NELEM(RFID_Commands); i++) {
-	  if (code == RFID_Commands[i].id) {
-	    CommandParser::DoParse(RFID_Commands[i].cmd, RFID_Commands[i].arg);
-	  }
-	}
+  default_output->print("RFID: ");
+  for (int i = 36; i >= 0; i-=4) {
+    default_output->print((int)((code >> i) & 0xf), HEX);
+  }
+  default_output->println("");
+  for (size_t i = 0; i < NELEM(RFID_Commands); i++) {
+    if (code == RFID_Commands[i].id) {
+      CommandParser::DoParse(RFID_Commands[i].cmd, RFID_Commands[i].arg);
+    }
+  }
       }
     }
     STATE_MACHINE_END();
@@ -1502,8 +1566,8 @@ public:
       default_output->println("");
     }
     if (!CommandParser::DoParse(cmd, e)) {
-      STDOUT.print("Whut? :");
-      STDOUT.println(cmd);
+      //STDOUT.print("Whut? :");
+      //STDOUT.println(cmd);
     }
     STDOUT.print(SA::response_footer());
     stdout_output = default_output;

@@ -297,7 +297,11 @@ class Effect {
     }
 
     default_output->print("Playing ");
-    default_output->println(filename);
+    default_output->print(filename);
+    default_output->print(" effect:");
+    default_output->println(name_);
+    //setname(name_); // remember for wav_time function selection
+
   }
 
   // Returns true if file was identified.
@@ -387,13 +391,19 @@ class Effect {
 	  talkie.Say(talkie_error_in_15, 15);
 	  talkie.Say(talkie_font_directory_15, 15);
 	}
-	e->Show();
+//	e->Show();
       }
+      e->Show();
     }
     LOCK_SD(false);
   }
 
   Effect* next_;
+  Effect* current_;
+  
+  // All files must start with this prefix. Public so other functions can use it
+  const char* name_ = "";
+  
 private:
   Effect* following_ = nullptr;
 
@@ -413,10 +423,6 @@ private:
   bool unnumbered_file_found_;
 
   FilePattern file_pattern_ = FilePattern::UNKNOWN;
-
-  // All files must start with this prefix.
-  const char* name_;
-
   // If not -1, return this file.
   int16_t selected_;
 
@@ -498,9 +504,18 @@ EFFECT(boom);
 
 // Color change
 EFFECT(color);
-EFFECT(ccbegin);
+EFFECT(ccbegin); //color change begin
 EFFECT(ccend);
 EFFECT(ccchange);
+
+// Volume change
+EFFECT(cfg_vol);
+
+// Brightness change
+EFFECT(cfg_dim);
+
+// Exit change
+EFFECT(cfg_exit);
 
 // Blaster effects
 // hum, boot and font are reused from sabers and already defined.

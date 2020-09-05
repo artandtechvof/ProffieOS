@@ -423,6 +423,27 @@ public:
           beeper.Beep(0.05, 2000.0);
         }
         break;
+      case SaberBase::ENTER_VOLUME_CHANGE:
+        if (!PlayPolyphonic(&SFX_cfg_vol)) {
+          beeper.Beep(0.20, 1000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 2000.0);
+        }
+        break;
+      case SaberBase::ENTER_DIM_CHANGE:
+        if (!PlayPolyphonic(&SFX_cfg_dim)) {
+          beeper.Beep(0.20, 1000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 2000.0);
+        }
+        break;
+      case SaberBase::EXIT_MENU:
+        if (!PlayPolyphonic(&SFX_cfg_exit)) {
+          beeper.Beep(0.20, 2000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 1000.0);
+        }
+        break;
     }
   }
 

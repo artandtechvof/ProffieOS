@@ -27,6 +27,10 @@
 #define BUTTON_HELD_LONG_TIMEOUT 2000
 #endif
 
+#ifndef BUTTON_HELD_EXTRA_LONG_TIMEOUT
+#define BUTTON_HELD_EXTRA_LONG_TIMEOUT 10000
+#endif
+
 
 // Simple button handler. Keeps track of clicks and lengths of pushes.
 class ButtonBase : public Looper,
@@ -67,61 +71,68 @@ protected:
   void Loop() override {
     STATE_MACHINE_BEGIN();
     while (true) {
-      while (!DebouncedRead()) {
-	if (saved_event_ &&
-	    millis() - push_millis_ > BUTTON_DOUBLE_CLICK_TIMEOUT) {
-	  Send(saved_event_);
-	  saved_event_ = 0;;
-	}
-	YIELD();
-      }
-      saved_event_ = 0;
-      if (millis() - push_millis_ < BUTTON_DOUBLE_CLICK_TIMEOUT) {
-	if (press_count_ < 3) press_count_++;
-      } else {
-	press_count_ = 1;
-      }
-      Send(EVENT_PRESSED);
-      push_millis_ = millis();
-      current_modifiers |= button_;
-      while (DebouncedRead() && (current_modifiers & button_)) {
-        if (millis() - push_millis_ > BUTTON_HELD_TIMEOUT) {
-          Send(EVENT_HELD);
-          while (DebouncedRead() && (current_modifiers & button_)) {
-            if (millis() - push_millis_ > BUTTON_HELD_MEDIUM_TIMEOUT){
-              Send(EVENT_HELD_MEDIUM);
-	      while (DebouncedRead() && (current_modifiers & button_)) {
-                if (millis() - push_millis_ > BUTTON_HELD_LONG_TIMEOUT) {
-                  Send(EVENT_HELD_LONG);
-		  while (DebouncedRead() && (current_modifiers & button_)) YIELD();
-                }
-                YIELD();
-              }
-            }
-            YIELD();
-          }
+		while (!DebouncedRead()) {
+			if (saved_event_ &&
+				millis() - push_millis_ > BUTTON_DOUBLE_CLICK_TIMEOUT) {
+			  Send(saved_event_);
+			  saved_event_ = 0;;
+			}
+			YIELD();
+  	    }
+        saved_event_ = 0;
+        if (millis() - push_millis_ < BUTTON_DOUBLE_CLICK_TIMEOUT) {
+			if (press_count_ < 3) press_count_++;
+		} else {
+			press_count_ = 1;
+		}
+		Send(EVENT_PRESSED);
+		push_millis_ = millis();
+		current_modifiers |= button_;
+		while (DebouncedRead() && (current_modifiers & button_)) {
+			if (millis() - push_millis_ > BUTTON_HELD_TIMEOUT) {
+				Send(EVENT_HELD);
+				while (DebouncedRead() && (current_modifiers & button_)) {
+					if (millis() - push_millis_ > BUTTON_HELD_MEDIUM_TIMEOUT){
+						Send(EVENT_HELD_MEDIUM);
+						while (DebouncedRead() && (current_modifiers & button_)) {
+							if (millis() - push_millis_ > BUTTON_HELD_LONG_TIMEOUT) {
+								Send(EVENT_HELD_LONG);
+								while (DebouncedRead() && (current_modifiers & button_)) {
+								//SHOULD BE WAITING HERE AFTER HELD LONG??
+									if (millis() - push_millis_ > BUTTON_HELD_EXTRA_LONG_TIMEOUT) {
+										Send(EVENT_HELD_EXTRA_LONG);
+										while (DebouncedRead() && (current_modifiers & button_)) YIELD();
+									}
+								YIELD();
+								}
+							}
+						YIELD();
+						}
+					}
+				YIELD();
+				}
+			}
+		YIELD();
         }
-        YIELD();
-      }
-      while (DebouncedRead()) YIELD();
-      if (current_modifiers & button_) {
-	Send(EVENT_RELEASED);
-      }
-      if (current_modifiers & button_) {
-        current_modifiers &=~ button_;
-        if (millis() - push_millis_ < BUTTON_SHORT_CLICK_TIMEOUT) {
-          SendClick(EVENT_CLICK_SHORT);
-        } else if (millis() - push_millis_ < 2500) {
-	  // Long clicks cannot be "saved", so just emit immediately.
-          Send(EVENT_CLICK_LONG);
-        }
-      } else {
-        // someone ate our clicks
-        push_millis_ = millis() - 10000; // disable double click
-      }
+        while (DebouncedRead()) YIELD();
+        if (current_modifiers & button_) {
+			Send(EVENT_RELEASED);
+		}
+		if (current_modifiers & button_) {
+			current_modifiers &=~ button_;
+			if (millis() - push_millis_ < BUTTON_SHORT_CLICK_TIMEOUT) {
+				SendClick(EVENT_CLICK_SHORT);
+			} else if (millis() - push_millis_ < 2500) {
+			// Long clicks cannot be "saved", so just emit immediately.
+				Send(EVENT_CLICK_LONG);
+			}
+		} else {
+			// someone ate our clicks
+			push_millis_ = millis() - 10000; // disable double click
+		}
     }
     STATE_MACHINE_END();
-  }
+ }
 
   bool Parse(const char* cmd, const char* arg) override {
     if (!strcmp(cmd, name_)) {

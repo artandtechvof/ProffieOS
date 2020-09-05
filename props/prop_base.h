@@ -154,7 +154,7 @@ public:
 
   virtual void Clash(bool stab) {
     // No clashes in lockup mode.
-    if (SaberBase::Lockup()) return;
+    if (SaberBase::Lockup() | SaberBase::Lockup1()) return;
     // TODO: Pick clash randomly and/or based on strength of clash.
     uint32_t t = millis();
     if (t - last_clash_ < clash_timeout_) {
@@ -838,6 +838,28 @@ public:
 
 #endif
 
+   if (change_volume_){
+        float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
+		current_tick_angle_ = fusor.angle2();
+        if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
+        if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
+        int32_t volume_ = dynamic_mixer.get_volume() + (int32_t)(delta * 1000); //a =+/- 1.5
+        if (volume_ > MAXVOLUME) {volume_ = MAXVOLUME;}
+        if (volume_ < 25) {volume_ = 25;}		
+        dynamic_mixer.set_volume(volume_);
+	}
+
+   if (change_brightness_){
+        float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
+		current_tick_angle_ = fusor.angle2();
+        if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
+        if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
+        int32_t brightness_ = SaberBase::GetCurrentBrightness() + (int32_t)(delta * 5000); //a =+/- 1.5
+		brightness_ = clampi32(brightness_, 0, 16384);
+        SaberBase::SetBrightness((float)brightness_ / 16384.0 * 100);
+	}
+
+
     Vec3 mss = fusor.mss();
     if (mss.y * mss.y + mss.z * mss.z < 16.0 &&
         (mss.x > 7 || mss.x < -6)  &&
@@ -864,6 +886,46 @@ public:
 #ifdef IDLE_OFF_TIME
   uint32_t last_on_time_;
 #endif
+
+  void ToggleMenuChangeMode() {
+    if (SaberBase::GetMenuChangeMode() == SaberBase::MENU_CHANGE_MODE_NONE){	  
+	  SaberBase::SetMenuChangeMode(SaberBase::MENU_CHANGE_MODE_ACTIVE);
+	} else {
+	  SaberBase::SetMenuChangeMode(SaberBase::MENU_CHANGE_MODE_NONE);
+	}
+  }
+
+
+  bool change_volume_ = false;
+  bool VolumeChangeMode(){return change_volume_;}
+  void ToggleVolumeChangeMode() {
+    if (!change_volume_){	  
+      current_tick_angle_ = fusor.angle2();
+	  change_volume_ =  true;
+	  SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_SMOOTH);
+	} else {
+		change_volume_ = false;
+		STDOUT.print("volume set to: ");
+		STDOUT.println(dynamic_mixer.get_volume());
+	    SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_NONE);
+	}
+  }
+
+  bool change_brightness_ = false;
+  bool BrightnessChangeMode(){return change_brightness_;}
+  void ToggleBrightnessChangeMode() {
+    if (!change_brightness_){	  
+      current_tick_angle_ = fusor.angle2();
+	  change_brightness_ =  true;
+	  SaberBase::SetDimChangeMode(SaberBase::DIM_CHANGE_MODE_SMOOTH);
+	} else {
+		change_brightness_ = false;
+		STDOUT.print("brightness set to: ");
+		STDOUT.println((float)SaberBase::GetCurrentBrightness()*100.0/16384.0);
+	    SaberBase::SetDimChangeMode(SaberBase::DIM_CHANGE_MODE_NONE);
+	}
+  }
+
 
 #ifndef DISABLE_COLOR_CHANGE
   void ToggleColorChangeMode() {
@@ -923,6 +985,7 @@ public:
       case EVENT_HELD: STDOUT.print("Held"); break;
       case EVENT_HELD_MEDIUM: STDOUT.print("HeldMedium"); break;
       case EVENT_HELD_LONG: STDOUT.print("HeldLong"); break;
+      case EVENT_HELD_EXTRA_LONG: STDOUT.print("Held Xtra Long"); break;
       case EVENT_CLICK_SHORT: STDOUT.print("Shortclick"); break;
       case EVENT_CLICK_LONG: STDOUT.print("Longclick"); break;
       case EVENT_SAVED_CLICK_SHORT: STDOUT.print("SavedShortclick"); break;
@@ -1278,10 +1341,28 @@ public:
       SaberBase::SetVariation(variation);
       return true;
     }
+
+    if (!strcmp(cmd, "get_var") || !strcmp(cmd, "get_variation")) {
+      STDOUT.println(SaberBase::GetCurrentVariation());
+      return true;
+    }
+
     if (!strcmp(cmd, "ccmode")) {
       ToggleColorChangeMode();
       return true;
     }
+
+    if (!strcmp(cmd, "get_dim")) {
+      STDOUT.println((float)SaberBase::GetCurrentBrightness()/ 16384.0 *100.0);
+      return true;
+    }
+
+    if (arg && (!strcmp(cmd, "dim"))) {
+      size_t dim = strtol(arg, NULL, 0);
+      SaberBase::SetBrightness((float)dim);
+      return true;
+    }
+
 #endif
 
 #ifdef ENABLE_SD

@@ -8,6 +8,8 @@
 #define V3
 #define PROFFIEBOARD
 #define USE_I2S
+#define ENABLE_I2S_OUT
+//#define ENABLE_SPDIF_OUT
 #define GYRO_CLASS LSM6DS3H
 
 // Proffieboard pin map
@@ -23,7 +25,8 @@ enum SaberPins {
 
   // Buttons
   powerButtonPin = 21,            // power button  PB6
-  auxPin = 23,                    // AUX button    PB5
+  auxPin = -1,                    // AUX button    PB5
+  //auxPin = 23,                    // AUX button    PB5
   aux2Pin = 22,                   // AUX2 button   PB4
 
   // Memory card
@@ -42,8 +45,10 @@ enum SaberPins {
   bladePin = 16,                  // blade control, either WS2811 or PWM PA0
   bladeIdentifyPin = 16,          // blade identify input / FoC
   blade2Pin = 1,                  // PB10
-  blade3Pin = 17,                 // PB3
-  blade4Pin = 0,                  // PA4
+  //blade3Pin = 17,                 // PB3
+  blade3Pin = -1,                 // PB3
+  //blade4Pin = 0,                  // PA4
+  blade4Pin = -1,                  // PA4
   blade5Pin = 8,                  // PA15 (also UART)
   blade6Pin = 9,                  // PA02 (also UART)
 
