@@ -292,6 +292,10 @@ SaberBase* saberbases = NULL;
 SaberBase::LockupType SaberBase::lockup_ = SaberBase::LOCKUP_NONE;
 SaberBase::ColorChangeMode SaberBase::color_change_mode_ =
   SaberBase::COLOR_CHANGE_MODE_NONE;
+#ifdef ENABLE_MENU_VOLUME
+SaberBase::VolumeChangeMode SaberBase::volume_change_mode_ =
+  SaberBase::VOLUME_CHANGE_MODE_NONE;
+#endif									 
 bool SaberBase::on_ = false;
 uint32_t SaberBase::last_motion_request_ = 0;
 uint32_t SaberBase::current_variation_ = 0;

@@ -423,6 +423,22 @@ public:
           beeper.Beep(0.05, 2000.0);
         }
         break;
+#ifdef ENABLE_MENU_VOLUME										  
+      case SaberBase::ENTER_VOLUME_CHANGE:
+        if (!PlayPolyphonic(&SFX_volbgn)) {
+          beeper.Beep(0.20, 1000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 2000.0);
+        }
+        break;
+      case SaberBase::EXIT_VOLUME_CHANGE:
+        if (!PlayPolyphonic(&SFX_volend)) {
+          beeper.Beep(0.20, 2000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 1000.0);
+        }
+        break;
+#endif											
     }
   }
 

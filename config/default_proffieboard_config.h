@@ -12,7 +12,8 @@
 #include "proffieboard_config.h"
 #define NUM_BLADES 2
 #define NUM_BUTTONS 2
-#define VOLUME 1000
+#define VOLUME 100
+#define MAXVOLUME 2500 // or should these defines be in the profile that alse enables/desiables the menus?
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 1.0
 #define ENABLE_AUDIO
@@ -20,11 +21,12 @@ const unsigned int maxLedsPerStrip = 144;
 #define ENABLE_WS2811
 #define ENABLE_SD
 #define ENABLE_SERIAL
+#define ENABLE_MENU_VOLUME  // or should these defines be in the profile that alse enables/desiables the menus?
 #endif
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
-  { "TeensySF", "tracks/venus.wav",
+  { "common;TeensySF", "tracks/venus.wav",
     StyleNormalPtr<CYAN, WHITE, 300, 800>(),
     StyleNormalPtr<CYAN, WHITE, 300, 800>(), "cyan"},
   { "SmthJedi", "tracks/mars.wav",

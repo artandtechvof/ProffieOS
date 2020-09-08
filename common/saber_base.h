@@ -81,6 +81,10 @@ public:
     ENTER_COLOR_CHANGE,
     EXIT_COLOR_CHANGE,
     CHANGE_COLOR,
+#ifdef ENABLE_MENU_VOLUME
+    ENTER_VOLUME_CHANGE,
+    EXIT_VOLUME_CHANGE,
+#endif					 
   };
 
   // 1.0 = kDefaultVolume
@@ -195,6 +199,23 @@ public:                                                         \
       DoChange(ENTER_COLOR_CHANGE);
     }
   }
+  
+#ifdef ENABLE_MENU_VOLUME
+  enum VolumeChangeMode {
+    VOLUME_CHANGE_MODE_NONE,
+    VOLUME_CHANGE_MODE_SMOOTH
+  };
+
+  static VolumeChangeMode GetVolumeChangeMode() { return volume_change_mode_; }
+  static void SetVolumeChangeMode(VolumeChangeMode  mode) {
+    volume_change_mode_ = mode;
+    if (mode == VOLUME_CHANGE_MODE_NONE) {
+      DoChange(EXIT_VOLUME_CHANGE); // to prevent beeps from playing
+    } else {
+      DoChange(ENTER_VOLUME_CHANGE);
+    }
+  }
+#endif
 
 private:
   static bool on_;
@@ -202,6 +223,9 @@ private:
   static uint32_t last_motion_request_;
   static uint32_t current_variation_;
   static ColorChangeMode color_change_mode_;
+#ifdef ENABLE_MENU_VOLUME
+  static VolumeChangeMode volume_change_mode_;
+#endif										
   SaberBase* next_saber_;
 };
 

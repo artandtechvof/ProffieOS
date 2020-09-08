@@ -839,6 +839,19 @@ public:
 
 #endif
 
+#ifdef ENABLE_MENU_VOLUME
+   if (SaberBase::GetVolumeChangeMode() != SaberBase::VOLUME_CHANGE_MODE_NONE){
+        float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
+        current_tick_angle_ = fusor.angle2();
+        if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
+        if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
+        int32_t volume_ = dynamic_mixer.get_volume() + (int32_t)(delta * 1000); //a =+/- 1.5
+        if (volume_ > MAXVOLUME) {volume_ = MAXVOLUME;}
+        if (volume_ < 25) {volume_ = 25;}       
+        dynamic_mixer.set_volume(volume_);
+   }
+#endif	
+																										
     Vec3 mss = fusor.mss();
     if (mss.y * mss.y + mss.z * mss.z < 16.0 &&
         (mss.x > 7 || mss.x < -6)  &&
@@ -866,6 +879,19 @@ public:
   uint32_t last_on_time_;
 #endif
 
+#ifdef ENABLE_MENU_VOLUME
+  void ToggleVolumeChangeMode() {
+    if (SaberBase::GetVolumeChangeMode() == SaberBase::VOLUME_CHANGE_MODE_NONE){     
+      current_tick_angle_ = fusor.angle2();
+      SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_SMOOTH);
+    } else {
+        STDOUT.print("volume set to: ");
+        STDOUT.println(dynamic_mixer.get_volume());
+        SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_NONE);
+    }
+  }
+#endif			
+				   
 #ifndef DISABLE_COLOR_CHANGE
   void ToggleColorChangeMode() {
     if (!current_style()) return;
@@ -1283,6 +1309,13 @@ public:
     }
     if (!strcmp(cmd, "ccmode")) {
       ToggleColorChangeMode();
+      return true;
+    }
+#endif
+
+#ifdef ENABLE_MENU_VOLUME
+    if (!strcmp(cmd, "vol_mode")) {
+      ToggleVolumeChangeMode();
       return true;
     }
 #endif
