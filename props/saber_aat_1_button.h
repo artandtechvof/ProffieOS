@@ -228,9 +228,9 @@ public:
                     next_preset();
                     return true;
 
-                //case EVENTID(BUTTON_POWER, EVENT_TWIST, MODE_OFF | BUTTON_POWER):
-                //  previous_preset();
-                //   return true;
+                case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_OFF | BUTTON_POWER):
+                   previous_preset();
+                   return true;
                 
                 case EVENTID(BUTTON_NONE, EVENT_TWIST, MODE_OFF):
                     Parse("set_preset", "0");//select 1st preset
