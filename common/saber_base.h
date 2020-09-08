@@ -91,9 +91,9 @@ public:
     ENTER_COLOR_CHANGE,
     EXIT_COLOR_CHANGE,
     CHANGE_COLOR,
-	ENTER_VOLUME_CHANGE,
-	ENTER_DIM_CHANGE,
-	EXIT_MENU
+    ENTER_VOLUME_CHANGE,
+    ENTER_DIM_CHANGE,
+    EXIT_MENU
   };
 
   // 1.0 = kDefaultVolume
@@ -188,7 +188,7 @@ public:                                                         \
   }
   // For smooth updates or restore.
   static void SetBrightness(float v) {
-	current_brightness_ = (int)(v * 16384 / 100.0);  
+    current_brightness_ = (int)(v * 16384 / 100.0);  
     current_brightness_ = clampi32(current_brightness_, 0, 16384) ;
   }
 

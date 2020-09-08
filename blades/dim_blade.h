@@ -6,11 +6,11 @@ public:
   DimBladeWrapper(BladeBase* blade, int fraction) {
     blade_ = blade;
     //fraction_ = fraction;
-	SaberBase::SetBrightness((float)fraction/16384.0*100.0);
+    SaberBase::SetBrightness((float)fraction/16384.0*100.0);
   }
   void set(int led, Color16 c) override {
-	int fraction_ = SaberBase::GetCurrentBrightness();
-	Color16 ret;
+    int fraction_ = SaberBase::GetCurrentBrightness();
+    Color16 ret;
     ret.r = clampi32((c.r * fraction_) >> 14, 0, 65535);
     ret.g = clampi32((c.g * fraction_) >> 14, 0, 65535);
     ret.b = clampi32((c.b * fraction_) >> 14, 0, 65535);

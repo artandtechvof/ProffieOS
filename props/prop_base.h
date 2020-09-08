@@ -215,18 +215,18 @@ public:
       smooth_swing_config.ReadInCurrentDir("smoothsw.ini");
       if (SFX_lswing) {
         smooth_swing_cfx_config.ReadInCurrentDir("font_config.txt");
-	// map CFX values to Proffie (sourced from font_config.txt in font folder)
-	smooth_swing_config.SwingSensitivity = smooth_swing_cfx_config.smooth_sens;
-	smooth_swing_config.MaximumHumDucking = smooth_swing_cfx_config.smooth_dampen;
-	smooth_swing_config.SwingSharpness = smooth_swing_cfx_config.smooth_sharp;
-	smooth_swing_config.SwingStrengthThreshold = smooth_swing_cfx_config.smooth_gate;
-	smooth_swing_config.Transition1Degrees = smooth_swing_cfx_config.smooth_width1;
-	smooth_swing_config.Transition2Degrees = smooth_swing_cfx_config.smooth_width2;
-	smooth_swing_config.MaxSwingVolume = smooth_swing_cfx_config.smooth_gain * 3 / 100;
-	smooth_swing_config.AccentSwingSpeedThreshold = smooth_swing_cfx_config.hswing;
-	smooth_swing_config.Version = 2;
+    // map CFX values to Proffie (sourced from font_config.txt in font folder)
+    smooth_swing_config.SwingSensitivity = smooth_swing_cfx_config.smooth_sens;
+    smooth_swing_config.MaximumHumDucking = smooth_swing_cfx_config.smooth_dampen;
+    smooth_swing_config.SwingSharpness = smooth_swing_cfx_config.smooth_sharp;
+    smooth_swing_config.SwingStrengthThreshold = smooth_swing_cfx_config.smooth_gate;
+    smooth_swing_config.Transition1Degrees = smooth_swing_cfx_config.smooth_width1;
+    smooth_swing_config.Transition2Degrees = smooth_swing_cfx_config.smooth_width2;
+    smooth_swing_config.MaxSwingVolume = smooth_swing_cfx_config.smooth_gain * 3 / 100;
+    smooth_swing_config.AccentSwingSpeedThreshold = smooth_swing_cfx_config.hswing;
+    smooth_swing_config.Version = 2;
       } else if (!SFX_swingl) {
-	smooth_swing_config.Version = 0;
+    smooth_swing_config.Version = 0;
       }
       switch (smooth_swing_config.Version) {
         case 1:
@@ -756,7 +756,7 @@ public:
     if (!LSFS::Exists(dir)) return;
     for (LSFS::Iterator i2(dir); i2; ++i2) {
       if (endswith(".wav", i2.name()) && i2.size() > 200000) {
-	STDOUT << dir << "/" << i2.name() << "\n";
+    STDOUT << dir << "/" << i2.name() << "\n";
       }
     }
   }
@@ -777,7 +777,7 @@ public:
           STDOUT << "Low battery: " << battery_monitor.battery() << " volts\n";
           SaberBase::DoLowBatt();
           last_beep_ = millis();
-	}
+    }
       }
     }
   }
@@ -833,6 +833,7 @@ public:
     if (monitor.ShouldPrint(Monitoring::MonitorVariation)) {
       STDOUT << " variation = " << SaberBase::GetCurrentVariation()
              << " ccmode = " << SaberBase::GetColorChangeMode()
+                                                                              
              << "\n";
     }
 
@@ -840,24 +841,24 @@ public:
 
    if (change_volume_){
         float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
-		current_tick_angle_ = fusor.angle2();
+        current_tick_angle_ = fusor.angle2();
         if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
         if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
         int32_t volume_ = dynamic_mixer.get_volume() + (int32_t)(delta * 1000); //a =+/- 1.5
         if (volume_ > MAXVOLUME) {volume_ = MAXVOLUME;}
-        if (volume_ < 25) {volume_ = 25;}		
+        if (volume_ < 25) {volume_ = 25;}       
         dynamic_mixer.set_volume(volume_);
-	}
+    }
 
    if (change_brightness_){
         float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
-		current_tick_angle_ = fusor.angle2();
+        current_tick_angle_ = fusor.angle2();
         if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
         if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
         int32_t brightness_ = SaberBase::GetCurrentBrightness() + (int32_t)(delta * 5000); //a =+/- 1.5
-		brightness_ = clampi32(brightness_, 0, 16384);
+        brightness_ = clampi32(brightness_, 0, 16384);
         SaberBase::SetBrightness((float)brightness_ / 16384.0 * 100);
-	}
+    }
 
 
     Vec3 mss = fusor.mss();
@@ -888,42 +889,42 @@ public:
 #endif
 
   void ToggleMenuChangeMode() {
-    if (SaberBase::GetMenuChangeMode() == SaberBase::MENU_CHANGE_MODE_NONE){	  
-	  SaberBase::SetMenuChangeMode(SaberBase::MENU_CHANGE_MODE_ACTIVE);
-	} else {
-	  SaberBase::SetMenuChangeMode(SaberBase::MENU_CHANGE_MODE_NONE);
-	}
+    if (SaberBase::GetMenuChangeMode() == SaberBase::MENU_CHANGE_MODE_NONE){      
+      SaberBase::SetMenuChangeMode(SaberBase::MENU_CHANGE_MODE_ACTIVE);
+    } else {
+      SaberBase::SetMenuChangeMode(SaberBase::MENU_CHANGE_MODE_NONE);
+    }
   }
 
 
   bool change_volume_ = false;
   bool VolumeChangeMode(){return change_volume_;}
   void ToggleVolumeChangeMode() {
-    if (!change_volume_){	  
+    if (!change_volume_){     
       current_tick_angle_ = fusor.angle2();
-	  change_volume_ =  true;
-	  SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_SMOOTH);
-	} else {
-		change_volume_ = false;
-		STDOUT.print("volume set to: ");
-		STDOUT.println(dynamic_mixer.get_volume());
-	    SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_NONE);
-	}
+      change_volume_ =  true;
+      SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_SMOOTH);
+    } else {
+        change_volume_ = false;
+        STDOUT.print("volume set to: ");
+        STDOUT.println(dynamic_mixer.get_volume());
+        SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_NONE);
+    }
   }
 
   bool change_brightness_ = false;
   bool BrightnessChangeMode(){return change_brightness_;}
   void ToggleBrightnessChangeMode() {
-    if (!change_brightness_){	  
+    if (!change_brightness_){     
       current_tick_angle_ = fusor.angle2();
-	  change_brightness_ =  true;
-	  SaberBase::SetDimChangeMode(SaberBase::DIM_CHANGE_MODE_SMOOTH);
-	} else {
-		change_brightness_ = false;
-		STDOUT.print("brightness set to: ");
-		STDOUT.println((float)SaberBase::GetCurrentBrightness()*100.0/16384.0);
-	    SaberBase::SetDimChangeMode(SaberBase::DIM_CHANGE_MODE_NONE);
-	}
+      change_brightness_ =  true;
+      SaberBase::SetDimChangeMode(SaberBase::DIM_CHANGE_MODE_SMOOTH);
+    } else {
+        change_brightness_ = false;
+        STDOUT.print("brightness set to: ");
+        STDOUT.println((float)SaberBase::GetCurrentBrightness()*100.0/16384.0);
+        SaberBase::SetDimChangeMode(SaberBase::DIM_CHANGE_MODE_NONE);
+    }
   }
 
 
@@ -974,7 +975,7 @@ public:
   void PrintEvent(uint32_t e) {
     int cnt = 0;
     if (e >= EVENT_FIRST_PRESSED &&
-	e <= EVENT_FOURTH_CLICK_LONG) {
+    e <= EVENT_FOURTH_CLICK_LONG) {
       cnt = (e - EVENT_PRESSED) / (EVENT_SECOND_PRESSED - EVENT_FIRST_PRESSED);
       e -= (EVENT_SECOND_PRESSED - EVENT_FIRST_PRESSED) * cnt;
     }
@@ -1088,26 +1089,26 @@ public:
     if (!strcmp(cmd, "lblock") || !strcmp(cmd, "lb")) {
       STDOUT.print("lblock ");
       if (SaberBase::Lockup() == SaberBase::LOCKUP_NONE) {
-	SaberBase::SetLockup(SaberBase::LOCKUP_LIGHTNING_BLOCK);
-	SaberBase::DoBeginLockup();
-	STDOUT.println("ON");
+    SaberBase::SetLockup(SaberBase::LOCKUP_LIGHTNING_BLOCK);
+    SaberBase::DoBeginLockup();
+    STDOUT.println("ON");
       } else {
-	SaberBase::DoEndLockup();
-	SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
-	STDOUT.println("OFF");
+    SaberBase::DoEndLockup();
+    SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
+    STDOUT.println("OFF");
       }
       return true;
     }
     if (!strcmp(cmd, "melt")) {
       STDOUT.print("melt ");
       if (SaberBase::Lockup() == SaberBase::LOCKUP_NONE) {
-	SaberBase::SetLockup(SaberBase::LOCKUP_MELT);
-	SaberBase::DoBeginLockup();
-	STDOUT.println("ON");
+    SaberBase::SetLockup(SaberBase::LOCKUP_MELT);
+    SaberBase::DoBeginLockup();
+    STDOUT.println("ON");
       } else {
-	SaberBase::DoEndLockup();
-	SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
-	STDOUT.println("OFF");
+    SaberBase::DoEndLockup();
+    SaberBase::SetLockup(SaberBase::LOCKUP_NONE);
+    STDOUT.println("OFF");
       }
       return true;
     }
@@ -1135,8 +1136,8 @@ public:
       if (player) {
         STDOUT.print("Playing ");
         STDOUT.println(arg);
-	if (!player->PlayInCurrentDir(arg))
-	  player->Play(arg);
+    if (!player->PlayInCurrentDir(arg))
+      player->Play(arg);
       } else {
         STDOUT.println("No available WAV players.");
       }
@@ -1157,8 +1158,8 @@ public:
       if (track_player_) {
         STDOUT.print("Playing ");
         STDOUT.println(arg);
-	if (!track_player_->PlayInCurrentDir(arg))
-	  track_player_->Play(arg);
+    if (!track_player_->PlayInCurrentDir(arg))
+      track_player_->Play(arg);
       } else {
         STDOUT.println("No available WAV players.");
       }
@@ -1331,7 +1332,9 @@ public:
 
     if (!strcmp(cmd, "set_preset") && arg) {
       size_t preset = strtol(arg, NULL, 0);
+                                                 
       SetPreset(preset, true);
+       
       return true;
     }
 
@@ -1372,9 +1375,9 @@ public:
       ListTracks("tracks");
       for (LSFS::Iterator iter("/"); iter; ++iter) {
         if (iter.isdir()) {
-	  PathHelper path(iter.name(), "tracks");
-	  ListTracks(path);
-	}
+      PathHelper path(iter.name(), "tracks");
+      ListTracks(path);
+    }
       }
       LOCK_SD(false);
       return true;

@@ -68,7 +68,7 @@ Preset presets[] = {
     StyleNormalPtr<BLACK, BLACK, 300, 800>(), "Battery\nLevel"}
 };
 BladeConfig blades[] = {
- { 0, WS2811BladePtr<97, WS2811_800kHz>(),
+ { 0, DimBlade(100.0,WS2811BladePtr<97, WS2811_800kHz>()),//sets initial value, can be modified with menu or serial commands
      SimpleBladePtr<CreeXPE2WhiteTemplate<550>,
                     CreeXPE2BlueTemplate<240>,
                     CreeXPE2BlueTemplate<240>, NoLED, bladePowerPin4, bladePowerPin5, bladePowerPin6, -1>(),
