@@ -423,37 +423,37 @@ public:
           beeper.Beep(0.05, 2000.0);
         }
         break;
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
       case SaberBase::ENTER_DIM_CHANGE:
         if (!PlayPolyphonic(&SFX_dimbgn)) {
-=======
+          beeper.Beep(0.20, 1000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 2000.0);
+        }
+        break;
+      case SaberBase::EXIT_DIM_CHANGE:
+        if (!PlayPolyphonic(&SFX_dimend)) {
+          beeper.Beep(0.20, 2000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 1000.0);
+        }
+#endif
 #ifdef ENABLE_MENU_VOLUME										  
       case SaberBase::ENTER_VOLUME_CHANGE:
         if (!PlayPolyphonic(&SFX_volbgn)) {
->>>>>>> feature_volume_menu
           beeper.Beep(0.20, 1000.0);
           beeper.Beep(0.20, 1414.2);
           beeper.Beep(0.20, 2000.0);
         }
         break;
-<<<<<<< HEAD
-      case SaberBase::EXIT_DIM_CHANGE:
-        if (!PlayPolyphonic(&SFX_dimend)) {
-=======
       case SaberBase::EXIT_VOLUME_CHANGE:
         if (!PlayPolyphonic(&SFX_volend)) {
->>>>>>> feature_volume_menu
           beeper.Beep(0.20, 2000.0);
           beeper.Beep(0.20, 1414.2);
           beeper.Beep(0.20, 1000.0);
         }
         break;
-<<<<<<< HEAD
 #endif
-=======
-#endif											
->>>>>>> feature_volume_menu
     }
   }
 

@@ -839,33 +839,33 @@ public:
 
 #endif
 
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
    if (SaberBase::GetDimChangeMode() == SaberBase::DIM_CHANGE_MODE_SMOOTH) {
-=======
-#ifdef ENABLE_MENU_VOLUME
-   if (SaberBase::GetVolumeChangeMode() != SaberBase::VOLUME_CHANGE_MODE_NONE){
->>>>>>> feature_volume_menu
         float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
         current_tick_angle_ = fusor.angle2();
         if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
         if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
-<<<<<<< HEAD
+
         int32_t brightness_ = SaberBase::GetCurrentBrightness() + (int32_t)(delta * 5000); //a =+/- 1.5
         brightness_ = clampi32(brightness_, 0, 16384);
         SaberBase::SetBrightness((float)brightness_ / 16384.0 * 100);
     }
 #endif
 
-=======
+#ifdef ENABLE_MENU_VOLUME
+   if (SaberBase::GetVolumeChangeMode() != SaberBase::VOLUME_CHANGE_MODE_NONE){
+        float delta = fmodf(fusor.angle2() - current_tick_angle_, M_PI * 2);//+ or - 2*pi from start point 0
+        current_tick_angle_ = fusor.angle2();
+        if (delta > M_PI) delta -= 2 * M_PI;//prevent pi jumps
+        if (delta < -M_PI) delta += 2 * M_PI;//prevent pi jumps
+
         int32_t volume_ = dynamic_mixer.get_volume() + (int32_t)(delta * 1000); //a =+/- 1.5
         if (volume_ > MAXVOLUME) {volume_ = MAXVOLUME;}
         if (volume_ < 25) {volume_ = 25;}       
         dynamic_mixer.set_volume(volume_);
    }
-#endif	
-																										
->>>>>>> feature_volume_menu
+#endif
+
     Vec3 mss = fusor.mss();
     if (mss.y * mss.y + mss.z * mss.z < 16.0 &&
         (mss.x > 7 || mss.x < -6)  &&
@@ -893,7 +893,6 @@ public:
   uint32_t last_on_time_;
 #endif
 
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
   //bool change_brightness_ = false;
   //bool BrightnessChangeMode() { return change_brightness_; }
@@ -911,7 +910,6 @@ public:
   }
 #endif
 
-=======
 #ifdef ENABLE_MENU_VOLUME
   void ToggleVolumeChangeMode() {
     if (SaberBase::GetVolumeChangeMode() == SaberBase::VOLUME_CHANGE_MODE_NONE){     
@@ -923,9 +921,8 @@ public:
         SaberBase::SetVolumeChangeMode(SaberBase::VOLUME_CHANGE_MODE_NONE);
     }
   }
-#endif			
-				   
->>>>>>> feature_volume_menu
+#endif
+
 #ifndef DISABLE_COLOR_CHANGE
   void ToggleColorChangeMode() {
     if (!current_style()) return;
@@ -1353,7 +1350,6 @@ public:
     }
 #endif
 
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
     if (!strcmp(cmd, "get_dim")) {
       STDOUT.println((float)SaberBase::GetCurrentBrightness()/ 16384.0 *100.0);
@@ -1368,11 +1364,12 @@ public:
     if (arg && (!strcmp(cmd, "dim"))) {
       size_t dim = strtol(arg, NULL, 0);
       SaberBase::SetBrightness((float)dim);
-=======
+	}
+#endif
+
 #ifdef ENABLE_MENU_VOLUME
-    if (!strcmp(cmd, "vol_mode")) {
+    if (!strcmp(cmd, "volumemode")) {
       ToggleVolumeChangeMode();
->>>>>>> feature_volume_menu
       return true;
     }
 #endif

@@ -42,7 +42,7 @@ public:
   enum MenuType {
     MENU_NONE,  
     MENU_COLOR,
-    //MENU_VOLUME,
+    MENU_VOLUME,
     MENU_DIM,
     NUM_MENUS
   };
@@ -64,16 +64,16 @@ public:
             ToggleColorChangeMode();
             return true;
             break;
-          // case MENU_VOLUME:
-            // if (SaberBase::GetColorChangeMode() != SaberBase::COLOR_CHANGE_MODE_NONE) {
-                // ToggleColorChangeMode();//Turn Colorchange control off
-            // }
-            // ToggleVolumeChangeMode();
-            // STDOUT.println("Enter Volume Menu");
-            // return true;
-            // break;
+          case MENU_VOLUME:
+            if (SaberBase::GetColorChangeMode() != SaberBase::COLOR_CHANGE_MODE_NONE) {
+                ToggleColorChangeMode();//Turn Colorchange control off
+            }
+            ToggleVolumeChangeMode();
+            STDOUT.println("Enter Volume Menu");
+            return true;
+            break;
           case MENU_DIM:
-            if (SaberBase::GetColorChangeMode() != SaberBase::COLOR_CHANGE_MODE_NONE) { // this should match previous menu
+            if (SaberBase::GetVolumeChangeMode() != SaberBase::VOLUME_CHANGE_MODE_NONE) { // this should match previous menu
                 ToggleColorChangeMode();//Turn Volume control off
                 SaveVolumeIfNeeded();
             }
@@ -103,12 +103,12 @@ public:
           exiting_ = true;
         }
         
-        // if (VolumeChangeMode()){
-          // ToggleVolumeChangeMode();
-          // SaveVolumeIfNeeded();
-          // STDOUT.println("Exit Volume Menu");
-          // exiting_ = true;
-        // }
+        if (VolumeChangeMode()){
+          ToggleVolumeChangeMode();
+          SaveVolumeIfNeeded();
+          STDOUT.println("Exit Volume Menu");
+          exiting_ = true;
+        }
 
         if (SaberBase::GetDimChangeMode() != SaberBase::DIM_CHANGE_MODE_NONE) { 
           ToggleBrightnessChangeMode();

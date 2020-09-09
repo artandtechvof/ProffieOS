@@ -13,10 +13,7 @@
 #define NUM_BLADES 2
 #define NUM_BUTTONS 2
 #define VOLUME 100
-<<<<<<< HEAD
-=======
 #define MAXVOLUME 2500 // or should these defines be in the profile that alse enables/desiables the menus?
->>>>>>> feature_volume_menu
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 1.0
 #define ENABLE_AUDIO
@@ -24,20 +21,13 @@ const unsigned int maxLedsPerStrip = 144;
 #define ENABLE_WS2811
 #define ENABLE_SD
 #define ENABLE_SERIAL
-<<<<<<< HEAD
 #define ENABLE_MENU_DIMBLADE
-=======
 #define ENABLE_MENU_VOLUME  // or should these defines be in the profile that alse enables/desiables the menus?
->>>>>>> feature_volume_menu
 #endif
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
-<<<<<<< HEAD
   { "common;TeensySF", "tracks/venus.wav", //menu sounds are in common folder
-=======
-  { "common;TeensySF", "tracks/venus.wav",
->>>>>>> feature_volume_menu
     StyleNormalPtr<CYAN, WHITE, 300, 800>(),
     StyleNormalPtr<CYAN, WHITE, 300, 800>(), "cyan"},
   { "SmthJedi", "tracks/mars.wav",

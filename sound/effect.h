@@ -502,20 +502,18 @@ EFFECT(ccbegin);
 EFFECT(ccend);
 EFFECT(ccchange);
 
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
 // DimBlade menu
 EFFECT(dimbgn);
 EFFECT(dimend);
 #endif
 
-=======
 #ifdef ENABLE_MENU_VOLUME
 // Volume change
 EFFECT(volbgn);
 EFFECT(volend);
-#endif					
->>>>>>> feature_volume_menu
+#endif
+
 // Blaster effects
 // hum, boot and font are reused from sabers and already defined.
 EFFECT(bgnauto); // Doesn't exist in fonts, but I expect there may be use for autofire transitions

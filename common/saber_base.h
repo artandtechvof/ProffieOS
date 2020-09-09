@@ -81,17 +81,14 @@ public:
     ENTER_COLOR_CHANGE,
     EXIT_COLOR_CHANGE,
     CHANGE_COLOR,
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
     ENTER_DIM_CHANGE,
     EXIT_DIM_CHANGE,
 #endif
-=======
 #ifdef ENABLE_MENU_VOLUME
     ENTER_VOLUME_CHANGE,
     EXIT_VOLUME_CHANGE,
 #endif					 
->>>>>>> feature_volume_menu
   };
 
   // 1.0 = kDefaultVolume
@@ -256,16 +253,13 @@ private:
   static uint32_t last_motion_request_;
   static uint32_t current_variation_;
   static ColorChangeMode color_change_mode_;
-<<<<<<< HEAD
 #ifdef ENABLE_MENU_DIMBLADE
   static uint32_t current_brightness_;
   static DimChangeMode dim_change_mode_;
 #endif
-=======
 #ifdef ENABLE_MENU_VOLUME
   static VolumeChangeMode volume_change_mode_;
 #endif										
->>>>>>> feature_volume_menu
   SaberBase* next_saber_;
 };
 
