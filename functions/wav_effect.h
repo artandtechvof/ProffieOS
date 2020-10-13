@@ -38,6 +38,8 @@ public:
 	   case EFFECT_UNJAM:	   	return "unjam";
 	   case EFFECT_PLI_ON:	   	return "plion";
 	   case EFFECT_PLI_OFF:	   	return "plioff";
+	   
+	   default: return "none";
 	  } 
 	 return "none"; 
 	  
