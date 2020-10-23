@@ -78,8 +78,6 @@ public:
   void PlayOnce(Effect* effect, float start = 0.0) {
     sample_bytes_ = 0;
     if (effect->Play(filename_)) {
-      STDOUT << "PlayOnce effect: " << effect->name_ ;	
-      effectname_ = effect->name_; // set effect name attribute to wav_players
       start_ = start;
       effect_ = nullptr;
       run_ = true;
@@ -88,13 +86,6 @@ public:
   }
   void PlayLoop(Effect* effect) {
     effect_ = effect;
-    if(effect_->name_[0] > 96 && effect_->name_[0] < 123){ // is it readable ascii??
-	  STDOUT << ", PlayLoop 2nd effect: " << effect_->name_;
-	  effect2ndname_ = effect_->name_;
-    }else{
-	  STDOUT << ", no 2nd effect ";
-	  effect2ndname_ = "none";
-    } 
   }
 
   void Stop() override {
@@ -382,26 +373,12 @@ public:
     return filename_;
   }
 
-  const char* effectname() const {
-    return effectname_;
-  }
-
-  const char* effect2ndname() const {
-     return effect2ndname_;
-  }  
-
-
 private:
   volatile bool run_ = false;
   Effect* volatile effect_ = nullptr;
   Effect::FileID new_file_id_;
   Effect::FileID old_file_id_;
   char filename_[128];
-  //const char* _2ndname_;
-  const char* effectname_;
-  const char* effect2ndname_;
-
-
   int16_t* dest_ = nullptr;
   int to_read_ = 0;
   int tmp_;

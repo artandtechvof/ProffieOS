@@ -394,10 +394,6 @@ class Effect {
   }
 
   Effect* next_;
-
-  // All files must start with this prefix.
-  const char* name_;
-  
 private:
   Effect* following_ = nullptr;
 
@@ -418,6 +414,8 @@ private:
 
   FilePattern file_pattern_ = FilePattern::UNKNOWN;
 
+  // All files must start with this prefix.
+  const char* name_;
 
   // If not -1, return this file.
   int16_t selected_;

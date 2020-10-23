@@ -20,8 +20,8 @@
 
 // You can have multiple configuration files, and specify which one
 // to use here.
-#define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
-//#define CONFIG_FILE "config/default_proffieboard_config.h"
+
+#define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
 // #define CONFIG_FILE "config/graflex_v1_config.h"
@@ -189,7 +189,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "v5.2";
+const char version[] = "$Id: ce12a06a1e236b5101ec60c950530a9a4719a74d $";
 const char install_time[] = __DATE__ " " __TIME__;
 
 #include "common/state_machine.h"
@@ -435,7 +435,6 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/marble.h"
 #include "functions/slice.h"
 #include "functions/mult.h"
-#include "functions/wav_time.h"
 
 // transitions
 #include "transitions/fade.h"
