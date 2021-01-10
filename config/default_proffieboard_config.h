@@ -12,7 +12,7 @@
 #include "proffieboard_config.h"
 #define NUM_BLADES 2
 #define NUM_BUTTONS 2
-#define VOLUME 1000
+#define VOLUME 100
 const unsigned int maxLedsPerStrip = 144;
 #define CLASH_THRESHOLD_G 1.0
 #define ENABLE_AUDIO
@@ -24,6 +24,33 @@ const unsigned int maxLedsPerStrip = 144;
 
 #ifdef CONFIG_PRESETS
 Preset presets[] = {
+	  { "common;VaderII", "tracks/main.wav",
+     StylePtr<Layers<
+		 Blue,
+		 BlastL<White>,
+		 SimpleClashL<White>,
+		 ResponsiveLockupL<Strobe<White,BrownNoiseFlicker<White,Red,300>,50,1>,
+		                   TrConcat<TrInstant,White,TrFade<200>>,TrFade<400>,
+						            Scale<BladeAngle<0,16000>,Int<10000>,Int<30000>>,Int<10000>,
+									Scale<SwingSpeed<100>,Int<10000>,Int<14000>>>,
+		 ResponsiveDragL<AudioFlicker<Blue,White>,TrInstant,TrInstant,Int<10000>,Int<16384>>,
+		 ResponsiveMeltL<Mix<TwistAngle<>,Red,Orange>,TrWipeIn<600>,TrSmoothFade<600>>,
+		 ResponsiveStabL<Orange,TrWipeIn<50>,TrWipe<50>>,BlastL<White>,
+		 ResponsiveLightningBlockL<White>,
+		 InOutTrL<  TrWipeX< Percentage<WavLen<EFFECT_IGNITION>,10> >, TrWipeInX< Percentage<WavLen<EFFECT_RETRACTION>, 5> >,Black>,
+		 
+		 TransitionEffectL<TrConcat<TrInstant,AlphaL<White,Bump<Int<0>,Int<6000>>>,
+						   TrFadeX<WavLen<EFFECT_RETRACTION>>,AlphaL<Orange,Bump<Int<0>,Int<4000>>>,
+						   TrFadeX< Percentage<WavLen<EFFECT_PSTOFF>,60> >,AlphaL<Red,Bump<Int<0>,Int<3000>>>,
+						   TrFadeX< Percentage<WavLen<EFFECT_PSTOFF>,40>> >,EFFECT_RETRACTION>,
+						   
+		 TransitionEffectL<TrConcat<TrFadeX< Percentage<WavLen<EFFECT_PREON>,125> >,AlphaL<HumpFlickerL<Orange,10>,Bump<Int<0>,Int<4000>>>,
+		                   TrFadeX< Percentage<WavLen<EFFECT_IGNITION>,50> >,AlphaL<HumpFlickerL<Orange,15>,Bump<Int<0>,Int<5000>>>,
+						   TrFadeX< Percentage<WavLen<EFFECT_IGNITION>,25> >,AlphaL<HumpFlickerL<White,20>,Bump<Int<0>,Int<6000>>>,
+						   TrBoingX< Percentage<WavLen<EFFECT_IGNITION>,15>,3>>,EFFECT_PREON>>
+		 >(),	
+    StyleNormalPtr<Green, White, 500, 1800>(),
+	"layers vader"},	
   { "TeensySF", "tracks/venus.wav",
     StyleNormalPtr<CYAN, WHITE, 300, 800>(),
     StyleNormalPtr<CYAN, WHITE, 300, 800>(), "cyan"},
@@ -68,7 +95,8 @@ Preset presets[] = {
     StyleNormalPtr<BLACK, BLACK, 300, 800>(), "Battery\nLevel"}
 };
 BladeConfig blades[] = {
- { 0, WS2811BladePtr<97, WS2811_800kHz>(),
+ { 0, //WS2811BladePtr<97, WS2811_800kHz>(),
+     WS281XBladePtr<50, bladePin, Color8::GRB, PowerPINS<> >(),
      SimpleBladePtr<CreeXPE2WhiteTemplate<550>,
                     CreeXPE2BlueTemplate<240>,
                     CreeXPE2BlueTemplate<240>, NoLED, bladePowerPin4, bladePowerPin5, bladePowerPin6, -1>(),

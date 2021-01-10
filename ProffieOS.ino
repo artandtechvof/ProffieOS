@@ -189,7 +189,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "$Id: ce12a06a1e236b5101ec60c950530a9a4719a74d $";
+const char version[] = "v5.7 synced audio";
 const char install_time[] = __DATE__ " " __TIME__;
 
 #include "common/state_machine.h"
@@ -435,6 +435,7 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/marble.h"
 #include "functions/slice.h"
 #include "functions/mult.h"
+#include "functions/wav_time.h"
 
 // transitions
 #include "transitions/fade.h"
