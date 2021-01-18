@@ -20,10 +20,8 @@
 
 // You can have multiple configuration files, and specify which one
 // to use here.
-// #define CONFIG_FILE "config/aat_teensy_helmet_config.h"
 // #define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
 #define CONFIG_FILE "config/default_proffieboard_config_singleblade.h"
-// #define CONFIG_FILE "config/default_proffieboard_config_nosloppy.h"
 // #define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"

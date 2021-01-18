@@ -307,6 +307,13 @@ public:
     return false;
   }
 
+  void Loop() override {
+    PropBase::Loop();
+    DetectTwist(); //otherwise Twist Effects will not be detected...
+    //DetectShake();
+ }
+
+
 private:
   RefPtr<BufferedWavPlayer> player;
   MenuType menu_ = MenuType(MENU_NONE);
