@@ -1,14 +1,16 @@
 #ifndef BLADES_DIM_BLADE_WRAPPER_H
 #define BLADES_DIM_BLADE_WRAPPER_H
 
-class DimBladeWrapper : public BladeWrapper, BladeStyle {
+class DimBladeWrapper : public BladeWrapper, BladeStyle, protected SaberBase{
 public:
   DimBladeWrapper(BladeBase* blade, int fraction) {
     blade_ = blade;
-    fraction_ = fraction;
+    //fraction_ = fraction;
+	SaberBase::SetBrightness((float)fraction/16384.0*100.0);
   }
   void set(int led, Color16 c) override {
-    Color16 ret;
+	int fraction_ = SaberBase::GetCurrentBrightness();
+	Color16 ret;
     ret.r = clampi32((c.r * fraction_) >> 14, 0, 65535);
     ret.g = clampi32((c.g * fraction_) >> 14, 0, 65535);
     ret.b = clampi32((c.b * fraction_) >> 14, 0, 65535);
@@ -62,7 +64,7 @@ public:
   
 private:
   BladeStyle *current_style_ = nullptr;
-  int fraction_;
+  //int fraction_;
 };
 
 // Reduces the brightness of the blade.

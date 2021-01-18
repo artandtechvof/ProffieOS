@@ -31,8 +31,8 @@ enum SaberPins {
   bladePowerPin6 = 5,             // Optional power control (TeensySaber V2)
   bladePowerPin1 = 6,             // blade power control
   spiLedSelect = -1,              // APA102/dotstar chip select
-  spiLedDataOut = 7,
-  spiLedClock = 8,
+  spiLedDataOut = 7,			  // BladePin2	
+  spiLedClock = 8,                // BladePin3
   bclkPin = 9,                    // BCLK (digital audio)
   bladePowerPin2 = 10,            // blade power control
   spiDataOut = 11,                // spi out, serial flash, spi led & sd card

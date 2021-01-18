@@ -122,6 +122,7 @@ public:
     }
 
     STDOUT.println(" font.");
+	//STDOUT.println("Linking Hybrid font SaberBase::Link(this)");
     SaberBase::Link(this);
     SetHumVolume(1.0);
     state_ = STATE_OFF;
@@ -431,6 +432,27 @@ public:
       case SaberBase::CHANGE_COLOR:
         if (!PlayPolyphonic(&SFX_ccchange)) {
           beeper.Beep(0.05, 2000.0);
+        }
+        break;
+      case SaberBase::ENTER_VOLUME_CHANGE:
+        if (!PlayPolyphonic(&SFX_cfg_vol)) {
+          beeper.Beep(0.20, 1000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 2000.0);
+        }
+        break;
+      case SaberBase::ENTER_DIM_CHANGE:
+        if (!PlayPolyphonic(&SFX_cfg_dim)) {
+          beeper.Beep(0.20, 1000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 2000.0);
+        }
+        break;
+      case SaberBase::EXIT_MENU:
+        if (!PlayPolyphonic(&SFX_cfg_exit)) {
+          beeper.Beep(0.20, 2000.0);
+          beeper.Beep(0.20, 1414.2);
+          beeper.Beep(0.20, 1000.0);
         }
         break;
     }

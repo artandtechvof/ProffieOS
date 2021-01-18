@@ -20,8 +20,11 @@
 
 // You can have multiple configuration files, and specify which one
 // to use here.
-
-#define CONFIG_FILE "config/default_proffieboard_config.h"
+// #define CONFIG_FILE "config/aat_teensy_helmet_config.h"
+// #define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
+#define CONFIG_FILE "config/default_proffieboard_config_singleblade.h"
+// #define CONFIG_FILE "config/default_proffieboard_config_nosloppy.h"
+// #define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
 // #define CONFIG_FILE "config/graflex_v1_config.h"
@@ -189,7 +192,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "v5.7 synced audio";
+const char version[] = "v5.7 synced audio and scroll menus";
 const char install_time[] = __DATE__ " " __TIME__;
 
 #include "common/state_machine.h"
@@ -292,9 +295,16 @@ SaberBase* saberbases = NULL;
 SaberBase::LockupType SaberBase::lockup_ = SaberBase::LOCKUP_NONE;
 SaberBase::ColorChangeMode SaberBase::color_change_mode_ =
   SaberBase::COLOR_CHANGE_MODE_NONE;
+SaberBase::VolumeChangeMode SaberBase::volume_change_mode_ =
+  SaberBase::VOLUME_CHANGE_MODE_NONE;
+SaberBase::DimChangeMode SaberBase::dim_change_mode_ =
+  SaberBase::DIM_CHANGE_MODE_NONE;
+SaberBase::MenuChangeMode SaberBase::menu_change_mode_ =
+  SaberBase::MENU_CHANGE_MODE_NONE;
 bool SaberBase::on_ = false;
 uint32_t SaberBase::last_motion_request_ = 0;
 uint32_t SaberBase::current_variation_ = 0;
+uint32_t SaberBase::current_brightness_ = 16384; //16384 = 100%
 
 #include "common/box_filter.h"
 
@@ -588,7 +598,8 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-#include "props/saber.h"
+//#include "props/saber.h"
+#include "props/saber_aat_1_button.h"
 #endif
 
 PROP_TYPE prop;

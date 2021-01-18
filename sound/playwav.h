@@ -78,7 +78,7 @@ public:
   void PlayOnce(Effect* effect, float start = 0.0) {
     sample_bytes_ = 0;
     if (effect->Play(filename_)) {
-      STDOUT << "PlayOnce effect: " << effect->name_ ;	
+      STDOUT << "PlayOnce effect: " << effect->name_  << " ";	
       effectname_ = effect->name_; // set effect name attribute to wav_players
       start_ = start;
       effect_ = nullptr;
@@ -88,9 +88,15 @@ public:
   }
   void PlayLoop(Effect* effect) {
     effect_ = effect;
-    if(effect_->name_[0] > 96 && effect_->name_[0] < 123){ // is it readable ascii??
-	  STDOUT << ", PlayLoop 2nd effect: " << effect_->name_;
-	  effect2ndname_ = effect_->name_;
+	if (effect_){
+		if(effect_->name_[0] > 96 && effect_->name_[0] < 123){ // is it readable ascii??
+		  STDOUT << ", PlayLoop 2nd effect: " << effect_->name_ << " ";
+		  effect2ndname_ = effect_->name_;
+		}
+		else{
+		  STDOUT << ", no valid 2nd effect ";
+		  effect2ndname_ = "none";
+		}
     }else{
 	  STDOUT << ", no 2nd effect ";
 	  effect2ndname_ = "none";

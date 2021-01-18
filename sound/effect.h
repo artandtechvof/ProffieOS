@@ -249,9 +249,12 @@ class Effect {
   }
 
   bool Play(char *filename) {
+	//default_output->print(" Playing effect sound ");  
     FileID f = RandomFile();
+	//default_output->print(" random ");  
     if (f == FileID()) return false;
     f.GetName(filename);
+	//default_output->print(" random ");  
     return true;
   }
 
@@ -296,7 +299,7 @@ class Effect {
       default: break;
     }
 
-    default_output->print("Playing ");
+    default_output->print("Playing (GetName) ");
     default_output->println(filename);
   }
 
@@ -502,9 +505,18 @@ EFFECT(boom);
 
 // Color change
 EFFECT(color);
-EFFECT(ccbegin);
+EFFECT(ccbegin); //color change begin
 EFFECT(ccend);
 EFFECT(ccchange);
+
+// Volume change
+EFFECT(cfg_vol);
+
+// Brightness change
+EFFECT(cfg_dim);
+
+// Exit change
+EFFECT(cfg_exit);
 
 // Blaster effects
 // hum, boot and font are reused from sabers and already defined.

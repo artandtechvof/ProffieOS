@@ -95,7 +95,9 @@ WS2811_Blade(WS2811PIN* pin,
     STDOUT.print(pin_->num_leds());
     STDOUT.println(" leds.");
     run_ = true;
+	STDOUT.println("Linking CommandParser CommandParser::Link(this)");
     CommandParser::Link();
+	STDOUT.println("Linking Looper CommandParser::Link(this)");
     Looper::Link();
     AbstractBlade::Activate();
   }

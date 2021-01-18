@@ -79,6 +79,7 @@ constexpr size_t NUMBER_OF_EFFECTS = (size_t)EffectTypeHelper::NUMBER_OF_EFFECTS
 class SaberBase {
 protected:
   void Link(SaberBase* x) {
+	//STDOUT.println("SaberBase::Link()"); // Note to self, you can not put a STDOUT here, it will freeze the ProffieOS
     CHECK_LL(SaberBase, saberbases, next_saber_);
     noInterrupts();
     x->next_saber_ = saberbases;
@@ -147,6 +148,9 @@ public:
     ENTER_COLOR_CHANGE,
     EXIT_COLOR_CHANGE,
     CHANGE_COLOR,
+	ENTER_VOLUME_CHANGE,
+	ENTER_DIM_CHANGE,
+	EXIT_MENU
   };
 
   // 1.0 = kDefaultVolume
@@ -218,9 +222,13 @@ public:                                                         \
     gyro.x = -gyro.x;
 #endif
     CHECK_LL(SaberBase, saberbases, next_saber_);
+	//int nr_of_saberbases = 0;
     for (SaberBase *p = saberbases; p; p = p->next_saber_) {
       p->SB_Accel(gyro, clear);
+	//  nr_of_saberbases++;
     }
+	//STDOUT.print("nr_of_saberbases :");
+	//STDOUT.println(nr_of_saberbases);
     CHECK_LL(SaberBase, saberbases, next_saber_);
   }
   virtual void SB_Accel(const Vec3& gyro, bool clear) {}
@@ -228,6 +236,16 @@ public:                                                         \
   static uint32_t GetCurrentVariation() {
     return current_variation_;
   }
+
+  static uint32_t GetCurrentBrightness() {
+    return current_brightness_;//value from 0~16384
+  }
+  // For smooth updates or restore.
+  static void SetBrightness(float v) {
+	current_brightness_ = (int)(v * 16384 / 100.0);  
+    current_brightness_ = clampi32(current_brightness_, 0, 16384) ;
+  }
+
 
   // For step-wise updates
   static void UpdateVariation(int delta) {
@@ -249,18 +267,66 @@ public:                                                         \
   static void SetColorChangeMode(ColorChangeMode  mode) {
     color_change_mode_ = mode;
     if (mode == COLOR_CHANGE_MODE_NONE) {
-      DoChange(EXIT_COLOR_CHANGE);
+      //DoChange(COLOR_COLOR_CHANGE); // to prevent beeps from playing
     } else {
       DoChange(ENTER_COLOR_CHANGE);
     }
   }
+
+  enum VolumeChangeMode {
+    VOLUME_CHANGE_MODE_NONE,
+    VOLUME_CHANGE_MODE_SMOOTH
+  };
+
+  static VolumeChangeMode GetVolumeChangeMode() { return volume_change_mode_; }
+  static void SetVolumeChangeMode(VolumeChangeMode  mode) {
+    volume_change_mode_ = mode;
+    if (mode == VOLUME_CHANGE_MODE_NONE) {
+      //DoChange(VOLUME_COLOR_CHANGE); // to prevent beeps from playing
+    } else {
+      DoChange(ENTER_VOLUME_CHANGE);
+    }
+  }
+
+  enum DimChangeMode {
+    DIM_CHANGE_MODE_NONE,
+    DIM_CHANGE_MODE_SMOOTH
+  };
+
+  static DimChangeMode GetDimChangeMode() { return dim_change_mode_; }
+  static void SetDimChangeMode(DimChangeMode  mode) {
+    dim_change_mode_ = mode;
+    if (mode == DIM_CHANGE_MODE_NONE) {
+      //DoChange(VOLUME_COLOR_CHANGE); // to prevent beeps from playing
+    } else {
+      DoChange(ENTER_DIM_CHANGE);
+    }
+  }
+
+  enum MenuChangeMode {
+    MENU_CHANGE_MODE_NONE,
+    MENU_CHANGE_MODE_ACTIVE
+  };
+
+  static MenuChangeMode GetMenuChangeMode() { return menu_change_mode_; }
+  static void SetMenuChangeMode(MenuChangeMode mode) {
+    menu_change_mode_ = mode;
+    if (mode == MENU_CHANGE_MODE_NONE) {
+      DoChange(EXIT_MENU);
+    }
+  }
+
 
 private:
   static bool on_;
   static LockupType lockup_;
   static uint32_t last_motion_request_;
   static uint32_t current_variation_;
+  static uint32_t current_brightness_;
   static ColorChangeMode color_change_mode_;
+  static VolumeChangeMode volume_change_mode_;
+  static DimChangeMode dim_change_mode_;
+  static MenuChangeMode menu_change_mode_;
   SaberBase* next_saber_;
 };
 
