@@ -79,7 +79,6 @@ constexpr size_t NUMBER_OF_EFFECTS = (size_t)EffectTypeHelper::NUMBER_OF_EFFECTS
 class SaberBase {
 protected:
   void Link(SaberBase* x) {
-	//STDOUT.println("SaberBase::Link()"); // Note to self, you can not put a STDOUT here, it will freeze the ProffieOS
     CHECK_LL(SaberBase, saberbases, next_saber_);
     noInterrupts();
     x->next_saber_ = saberbases;
@@ -222,13 +221,9 @@ public:                                                         \
     gyro.x = -gyro.x;
 #endif
     CHECK_LL(SaberBase, saberbases, next_saber_);
-	//int nr_of_saberbases = 0;
     for (SaberBase *p = saberbases; p; p = p->next_saber_) {
       p->SB_Accel(gyro, clear);
-	//  nr_of_saberbases++;
     }
-	//STDOUT.print("nr_of_saberbases :");
-	//STDOUT.println(nr_of_saberbases);
     CHECK_LL(SaberBase, saberbases, next_saber_);
   }
   virtual void SB_Accel(const Vec3& gyro, bool clear) {}

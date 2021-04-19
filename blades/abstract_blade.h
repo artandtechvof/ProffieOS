@@ -8,7 +8,6 @@ class AbstractBlade : public BladeBase, public SaberBase {
 public:
   AbstractBlade() : SaberBase(NOLINK) {}
   void Activate() override {
-	//STDOUT.println("Linking Abstract Blade CommandParser::Link(this)");
     SaberBase::Link(this);
   }
   void Deactivate() override {

@@ -98,6 +98,12 @@ public:
   LSM6DS3H() : I2CDevice(106), Looper(HFLINK) {}
 
   void Loop() override {
+#if 0
+    // Uncomment this to debug motion timeouts.
+    SaberBase::RequestMotion();
+    if (!random(300)) delay(350);
+#endif
+
     STATE_MACHINE_BEGIN();
 
     while (!i2cbus.inited()) YIELD();
@@ -122,7 +128,7 @@ public:
       I2C_WRITE_BYTE_ASYNC(INT1_CTRL, 0x3);  // Activate INT on data ready
       pinMode(motionSensorInterruptPin, INPUT);
       I2C_READ_BYTES_ASYNC(WHO_AM_I, databuffer, 1);
-      if (databuffer[0] == 105) {
+      if (databuffer[0] == 105 || databuffer[0] == 106) {
         STDOUT.println("done.");
       } else {
         STDOUT.println("failed.");

@@ -122,7 +122,6 @@ public:
     }
 
     STDOUT.println(" font.");
-	//STDOUT.println("Linking Hybrid font SaberBase::Link(this)");
     SaberBase::Link(this);
     SetHumVolume(1.0);
     state_ = STATE_OFF;
@@ -457,7 +456,6 @@ public:
         break;
     }
   }
-
   void SB_BeginLockup() {
     Effect *once = nullptr;
     Effect *loop = nullptr;

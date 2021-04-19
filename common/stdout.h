@@ -2,6 +2,9 @@
 #define COMMON_STDOUT_H
 
 #include "monitoring.h"
+#ifdef TEENSYDUINO
+#include "_usb_rawhid.h"
+#endif
 
 extern Print* default_output;
 extern Print* stdout_output;
@@ -23,12 +26,39 @@ public:
       stdout_output != default_output;
   }
   size_t write(uint8_t b) override {
-    size_t ret = stdout_output->write(b);
+#ifdef TEENSYDUINO
+#if defined(RAWHID_INTERFACE)	
+	size_t ret = 1;
+    if (stdout_output) {
+		ret = stdout_output->write(b);
+	} else {
+		SerialHID.write(b);   
+	}
+#else
+	size_t	ret = stdout_output->write(b);
+#endif
+#else
+	size_t	ret = stdout_output->write(b);
+#endif
     if (debug_is_on()) default_output->write(b);
     return ret;
   }
   size_t write(const uint8_t *buffer, size_t size) override {
-    size_t ret = stdout_output->write(buffer, size);
+#ifdef TEENSYDUINO
+#if defined(RAWHID_INTERFACE)	
+	size_t ret = 1;
+    if (stdout_output) {
+		ret = stdout_output->write(buffer, size);
+	} else {
+	    if (size > 64) {size = 64;}
+		SerialHID.write(buffer, size);   
+	}
+#else
+	size_t	ret = stdout_output->write(buffer, size);
+#endif
+#else
+	size_t	ret = stdout_output->write(buffer, size);
+#endif
     if (debug_is_on()) default_output->write(buffer, size);
     return ret;
   }

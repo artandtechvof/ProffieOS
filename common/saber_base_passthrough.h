@@ -13,7 +13,6 @@ protected:
     delegate_ = delegate;
     if (delegate_) {
       SaberBase::Unlink(delegate_);
-	  //STDOUT.println("Linking delegate SaberBase::Link(this)");
       SaberBase::Link(this);
     }
   }

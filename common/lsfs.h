@@ -185,6 +185,7 @@ public:
 #elif defined(TEENSYDUINO)
 
 #include <SD.h>
+//#include "SdFat.h"
 
 class LSFS {
 public:
@@ -259,6 +260,7 @@ public:
   private:
     File dir_;
     File f_;
+	//SdFat SD;
   };
 };
 #else

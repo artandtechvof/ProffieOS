@@ -95,9 +95,7 @@ WS2811_Blade(WS2811PIN* pin,
     STDOUT.print(pin_->num_leds());
     STDOUT.println(" leds.");
     run_ = true;
-	STDOUT.println("Linking CommandParser CommandParser::Link(this)");
     CommandParser::Link();
-	STDOUT.println("Linking Looper CommandParser::Link(this)");
     Looper::Link();
     AbstractBlade::Activate();
   }
@@ -330,7 +328,7 @@ template<int LEDS,
          int POWER_OFF_DELAY_MS = 0>
 class BladeBase *SPIBladePtr() {
   static POWER_PINS power_pins;
-  static PinClass<LEDS, CLOCK_PIN, DATA_PIN, byteorder, max_frequency> pin;
+  static PinClass<LEDS, DATA_PIN, CLOCK_PIN, byteorder, max_frequency> pin;
   static WS2811_Blade blade(&pin, &power_pins, POWER_OFF_DELAY_MS);
   return &blade;
 }

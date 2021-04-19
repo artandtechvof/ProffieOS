@@ -249,12 +249,9 @@ class Effect {
   }
 
   bool Play(char *filename) {
-	//default_output->print(" Playing effect sound ");  
     FileID f = RandomFile();
-	//default_output->print(" random ");  
     if (f == FileID()) return false;
     f.GetName(filename);
-	//default_output->print(" random ");  
     return true;
   }
 
@@ -299,7 +296,7 @@ class Effect {
       default: break;
     }
 
-    default_output->print("Playing (GetName) ");
+    default_output->print("Playing ");
     default_output->println(filename);
   }
 
@@ -420,7 +417,6 @@ private:
   bool unnumbered_file_found_;
 
   FilePattern file_pattern_ = FilePattern::UNKNOWN;
-
 
   // If not -1, return this file.
   int16_t selected_;

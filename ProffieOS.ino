@@ -20,8 +20,8 @@
 
 // You can have multiple configuration files, and specify which one
 // to use here.
-// #define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
-#define CONFIG_FILE "config/default_proffieboard_config_singleblade.h"
+#define CONFIG_FILE "config/aat_teensy_singleblade_config.h"
+//#define CONFIG_FILE "config/default_proffieboard_config_singleblade.h"
 // #define CONFIG_FILE "config/default_proffieboard_config.h"
 // #define CONFIG_FILE "config/default_v3_config.h"
 // #define CONFIG_FILE "config/crossguard_config.h"
@@ -137,6 +137,8 @@
 
 #include <i2c_t3.h>
 #include <SD.h>
+//#include <SdFat.h>
+//SdFat SD;
 #include <SPI.h>
 
 #define INPUT_ANALOG INPUT
@@ -190,7 +192,7 @@ SnoozeTouch snooze_touch;
 SnoozeBlock snooze_config(snooze_touch, snooze_digital, snooze_timer);
 #endif
 
-const char version[] = "v5.7 synced audio and scroll menus";
+const char version[] = "v5.9  synced audio and scroll menus WebHID";
 const char install_time[] = __DATE__ " " __TIME__;
 
 #include "common/state_machine.h"
@@ -303,7 +305,6 @@ bool SaberBase::on_ = false;
 uint32_t SaberBase::last_motion_request_ = 0;
 uint32_t SaberBase::current_variation_ = 0;
 uint32_t SaberBase::current_brightness_ = 16384; //16384 = 100%
-
 #include "common/box_filter.h"
 
 // Returns the decimals of a number, ie 12.2134 -> 0.2134
@@ -444,7 +445,6 @@ struct is_same_type<T, T> { static const bool value = true; };
 #include "functions/slice.h"
 #include "functions/mult.h"
 #include "functions/wav_time.h"
-
 // transitions
 #include "transitions/fade.h"
 #include "transitions/join.h"
@@ -596,8 +596,7 @@ ArgParserInterface* CurrentArgParser;
 #undef CONFIG_PROP
 
 #ifndef PROP_TYPE
-//#include "props/saber.h"
-#include "props/saber_aat_1_button.h"
+#include "props/saber.h"
 #endif
 
 PROP_TYPE prop;
@@ -1550,6 +1549,142 @@ private:
 };
 
 StaticWrapper<Parser<SerialAdapter>> parser;
+
+#ifdef TEENSYDUINO
+#include "common/_usb_rawhid.h"
+#if defined(RAWHID_INTERFACE)
+class RawHIDParser: Looper, StateMachine  {
+public:
+  RawHIDParser(): Looper() {}
+  const char* name() { return "HIDParser"; }
+
+  void setup() {
+    //nothing todo here;
+  }
+
+  void Loop() override {
+    STATE_MACHINE_BEGIN();
+    while (true) {
+//      while (!SA::Connected()) YIELD();
+//      if (!SA::AlwaysConnected()) {
+//        STDOUT.println("Welcome to ProffieOS, type 'help' for more info.");
+//      }
+
+      //while (SA::Connected()) {
+      while (true) {
+        while (!SerialHID.available()) YIELD();
+        if (SerialHID.recv(incommingReport, 1) > 0){
+        _idx = 0;
+        int c = 0xFF;
+        do{   
+          int c = incommingReport[_idx];
+          if (c == 0) { break; }
+  
+          if (c == '\n' || c == '\r') {
+            if (cmd_) ParseLine();
+            len_ = 0;
+            space_ = 0;
+            c = 0;
+            free(cmd_);
+            cmd_ = nullptr;
+            _idx++;
+            if (_idx > 63) _idx = 63;
+            continue;
+          }
+          if (len_ + 1 >= space_) {
+            int new_space = space_ * 3 / 2 + 8;
+            char* tmp = (char*)realloc(cmd_, new_space);
+            if (tmp) {
+              space_ = new_space;
+              cmd_ = tmp;
+            } else {
+              STDOUT.println("Line too long.");
+              len_ = 0;
+              space_ = 0;
+              free(cmd_);
+              cmd_ = nullptr;
+              continue;
+            }
+          }
+          cmd_[len_] = c;
+          cmd_[len_ + 1] = 0;
+          len_++;
+          _idx++;
+          if (_idx > 63) _idx = 63;
+        }while (c > 0 && _idx < 64);//do while
+        
+       }//If rawHID
+      }//while true
+      
+      len_ = 0;
+      space_ = 0;
+      free(cmd_);
+      cmd_ = nullptr;
+    } //while true
+     STATE_MACHINE_END();
+ } //void loop
+
+  void ParseLine() {
+    if (len_ == 0) return;
+    while (len_ > 0 && (cmd_[len_-1] == '\r' || cmd_[len_-1] == ' ')) {
+      len_--;
+      cmd_[len_] = 0;
+    }
+    if (cmd_[0] == '#') {
+      Serial.println(cmd_);
+      return;
+    }
+    stdout_output = nullptr; //reroute output to SerialHID
+    STDOUT.print(response_header());
+    char *cmd = cmd_;
+    while (*cmd == ' ') cmd++;
+    char *e = cmd;
+    while (*e != ' ' && *e) e++;
+    if (*e) {
+      *e = 0;
+      e++;  // e is now argument (if any)
+    } else {
+      e = nullptr;
+    }
+    Serial.print("Received command: ");
+    Serial.print(cmd);
+    if (e) {
+      Serial.print(" arg: ");
+      Serial.print(e);
+    }
+    Serial.print(" HEX ");
+    for (size_t i = 0; i < strlen(cmd); i++) {
+      Serial.print(cmd[i], HEX);
+      Serial.print(" ");
+    }
+    Serial.println("");
+    if (!CommandParser::DoParse(cmd, e)) {
+      STDOUT.print("Whut? :");
+      STDOUT.println(cmd);
+    }
+    STDOUT.print(response_footer());
+    stdout_output = default_output;
+  }
+
+private:
+  int len_ = 0;
+  char* cmd_ = nullptr;
+  int space_ = 0;
+  uint8_t _idx = 0; 
+  uint8_t outgoingReport[64];
+  uint8_t incommingReport[64];
+  static bool Connected() { return true; }
+  static bool AlwaysConnected() { return true; }
+  static const char* response_header() { return "-+=BEGIN_OUTPUT=+-\n"; }
+  static const char* response_footer() { return "-+=END_OUTPUT=+-\n"; }
+
+
+};
+
+StaticWrapper<RawHIDParser> serialhid_parser;
+#endif  //#if defined(RAWHID_INTERFACE)
+#endif  //#ifdef Teensyduino
+
 
 #ifdef ENABLE_SERIAL
 StaticWrapper<Parser<Serial3Adapter>> serial_parser;
