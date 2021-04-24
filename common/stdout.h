@@ -50,7 +50,6 @@ public:
     if (stdout_output) {
 		ret = stdout_output->write(buffer, size);
 	} else {
-	    if (size > 64) {size = 64;}
 		SerialHID.write(buffer, size);   
 	}
 #else

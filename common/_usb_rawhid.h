@@ -72,11 +72,19 @@ size_t _usb_rawhid_writeval(uint8_t val) {
 
 size_t _usb_rawhid_writebuf(const uint8_t *buf, size_t size) {
     uint8_t sendbuf[64];
-    memset(sendbuf,0, sizeof(sendbuf));
-    memcpy(sendbuf, buf, size);
+	uint8_t _offset = 0;
+	while(size > 64){
+		memcpy(sendbuf, buf + _offset, 64);
+		usb_rawhid_send(sendbuf, 100);
+		_offset += 64;
+		size -= 64;
+	}
+    memset(sendbuf,0, sizeof(sendbuf)); //clear buffer to flush unwanted characters
+    memcpy(sendbuf, buf + _offset, size);
     usb_rawhid_send(sendbuf, 100);
     return (size_t) 64;
 }
+
 
 
 // C++ interface
